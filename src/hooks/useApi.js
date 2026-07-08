@@ -1,0 +1,35 @@
+import { useState, useCallback } from 'react'
+
+export function useApi(apiFunction) {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [data, setData] = useState(null)
+
+  const execute = useCallback(
+    async (...args) => {
+      setLoading(true)
+      setError(null)
+      setData(null)
+      try {
+        const response = await apiFunction(...args)
+        setData(response.data)
+        return response.data
+      } catch (err) {
+        const message = err.message || 'An unexpected error occurred.'
+        setError(message)
+        throw err
+      } finally {
+        setLoading(false)
+      }
+    },
+    [apiFunction]
+  )
+
+  const reset = useCallback(() => {
+    setLoading(false)
+    setError(null)
+    setData(null)
+  }, [])
+
+  return { execute, loading, error, data, reset }
+}
