@@ -39,3 +39,30 @@
 - Login API
 - JWT authentication
 - Authentication middleware
+
+
+
+## Day 3
+### Completed
+- Implemented JWT token generation
+- User Login API
+- User Logout API
+- Protected Get Me API
+- Authentication middleware
+- Cookie-based authentication using cookie-parser
+- Configured CORS for frontend integration
+- Added JWT Secret, Token Expiry, and Client URL environment variables
+- Refactored token generation into a reusable utility
+- Improved authentication error handling
+### Tested
+- User login
+- User logout
+- Protected Get Me route
+- Invalid credentials
+- Invalid/expired JWT token
+- Unauthorized access without token
+### Next Goal
+- Request validation using Express Validator
+- Role-based authorization (Admin/Employee)
+- Ledger and Transaction schema design
+- CRUD APIs for Ledger module
