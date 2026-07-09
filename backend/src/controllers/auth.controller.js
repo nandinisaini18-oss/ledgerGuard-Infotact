@@ -1,6 +1,7 @@
 import mongoose from "mongoose"
 import userModel from "../models/user.model.js"
 import companyModel from "../models/company.model.js"
+import createToken from "../utils/generateToken.js"
 
 export async function registerUser(req , res){
     const {fullname , email , password , role , companyId} = req.body
@@ -39,20 +40,86 @@ export async function registerUser(req , res){
             companyId
         })
 
-        return res.status(201).json({
-            message : "user registered successfully",
-            success : true,
-            user : {
-                fullname : user.fullname,
-                email : user.email,
-                role : user.role,
-                companyId : user.companyId
-            }
-        })
+        return await createToken(res , user , "user registered successfully" , 201)
+
     }catch (err) {
         return res.status(500).json({
             success: false,
             message: err.message
         });
     }
+}
+
+export async function loginUser(req , res){
+    const {email , password} = req.body
+
+    try{
+        const user = await userModel.findOne({email}).select("+password")
+
+        if(!user){
+            return res.status(404).json({
+                message : "user not found",
+                success : false
+            })
+        }
+
+        const isPasswordMatched = await user.comparePassword(password)
+
+        if(!isPasswordMatched){
+            return res.status(401).json({
+                message : "Invalid credentials",
+                success : false
+            })
+        }
+
+        return createToken(res , user , "user loggedIn successfully" , 200)
+    }catch(err){
+        return res.status(500).json({
+            message : "something went wrong",
+            success : false
+        })
+    }
+}
+
+export async function getUser(req , res){
+    try{
+        const user = req.user;
+
+        if(!user){
+            return res.status(404).json({
+                message : "user not found",
+                success : false
+            })
+        }
+
+        return res.status(200).json({
+            message : "user details fetched successfully",
+            success : true,
+            user: {
+                id: user._id,
+                fullname: user.fullname,
+                email: user.email,
+                role: user.role,
+                companyId: user.companyId
+            }
+        })
+    }catch(err){
+        return res.status(500).json({
+            message : "something went wrong",
+            success : false
+        })
+    }
+}
+
+export async function logOutUser(req , res){
+    res.clearCookie("token" , {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: false
+    })
+
+    res.status(200).json({
+        message : "user loggedout successfully",
+        success : true
+    })
 }

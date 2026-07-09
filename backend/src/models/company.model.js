@@ -13,8 +13,8 @@ const companySchema = new mongoose.Schema({
     },
     subscriptionPlan : {
         type : String,
-        enum: ["Basic", "Pro", "Enterprise"],
-        default: "Basic"
+        enum: ["basic", "pro", "enterprise"],
+        default: "basic"
     },
     status : {
         type : String,
