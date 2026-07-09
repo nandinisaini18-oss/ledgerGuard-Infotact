@@ -9,9 +9,8 @@ import { validateRequired, validateEmail, validateForm } from '../utils/validato
 
 const subscriptionOptions = [
   { value: '', label: 'Select a plan\u2026' },
-  { value: 'free', label: 'Free' },
-  { value: 'starter', label: 'Starter' },
-  { value: 'professional', label: 'Professional' },
+  { value: 'basic', label: 'Basic' },
+  { value: 'pro', label: 'Pro' },
   { value: 'enterprise', label: 'Enterprise' },
 ]
 

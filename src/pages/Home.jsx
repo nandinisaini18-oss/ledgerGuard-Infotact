@@ -64,6 +64,11 @@ function Home() {
               Create Account
             </Button>
           </Link>
+          <Link to="/login">
+            <Button variant="ghost" size="lg">
+              Login
+            </Button>
+          </Link>
         </div>
       </section>
 

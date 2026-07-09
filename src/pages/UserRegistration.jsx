@@ -16,7 +16,6 @@ import {
 const roleOptions = [
   { value: '', label: 'Select a role\u2026' },
   { value: 'admin', label: 'Admin' },
-  { value: 'manager', label: 'Manager' },
   { value: 'user', label: 'User' },
 ]
 
@@ -85,6 +84,12 @@ function UserRegistration() {
   }
 
   if (success) {
+    const handleRegisterAnother = () => {
+      setSuccess(false)
+      setForm(initialForm)
+      setErrors({})
+    }
+
     return (
       <FormContainer
         title="User registered"
@@ -96,18 +101,21 @@ function UserRegistration() {
             </Link>
           </p>
         }
-      >
+      > 
         <Alert
           variant="success"
           title="Account created"
           message="The user has been registered and can now access the platform."
         />
         <div className="form-container__actions">
-          <Link to="/register-user">
-            <Button variant="primary" fullWidth>
-              Register Another User
-            </Button>
-          </Link>
+          <button
+            type="button"
+            onClick={handleRegisterAnother}
+            className="btn btn--primary btn--full-width"
+            style={{ marginBottom: 'var(--space-4)' }}
+          >
+            Register Another User
+          </button>
           <Link to="/">
             <Button variant="secondary" fullWidth>
               Back to Home

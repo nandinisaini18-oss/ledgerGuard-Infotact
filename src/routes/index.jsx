@@ -5,6 +5,8 @@ import Footer from '../components/layout/Footer'
 import Home from '../pages/Home'
 import CompanyRegistration from '../pages/CompanyRegistration'
 import UserRegistration from '../pages/UserRegistration'
+import Login from '../pages/Login'
+import Dashboard from '../pages/Dashboard'
 
 function AppRoutes() {
   const mainRef = useRef(null)
@@ -25,6 +27,8 @@ function AppRoutes() {
           <Route path="/" element={<Home />} />
           <Route path="/register-company" element={<CompanyRegistration />} />
           <Route path="/register-user" element={<UserRegistration />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
