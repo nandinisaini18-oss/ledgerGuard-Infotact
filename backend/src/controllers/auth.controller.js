@@ -58,8 +58,8 @@ export async function loginUser(req , res){
 
         if(!user){
             return res.status(404).json({
-                message : "user not found",
-                success : false
+                success : false,
+                message : "user not found"
             })
         }
 
@@ -67,16 +67,16 @@ export async function loginUser(req , res){
 
         if(!isPasswordMatched){
             return res.status(401).json({
-                message : "Invalid credentials",
-                success : false
+                success : false,
+                message : "Invalid credentials"
             })
         }
 
         return createToken(res , user , "user loggedIn successfully" , 200)
     }catch(err){
         return res.status(500).json({
-            message : "something went wrong",
-            success : false
+            success : false,
+            message : "Internal server error"
         })
     }
 }
@@ -87,8 +87,8 @@ export async function getUser(req , res){
 
         if(!user){
             return res.status(404).json({
-                message : "user not found",
-                success : false
+                success : false,
+                message : "user not found"
             })
         }
 
@@ -105,8 +105,8 @@ export async function getUser(req , res){
         })
     }catch(err){
         return res.status(500).json({
-            message : "something went wrong",
-            success : false
+            success : false,
+            message : "Internal server error"
         })
     }
 }
@@ -119,7 +119,7 @@ export async function logOutUser(req , res){
     })
 
     res.status(200).json({
-        message : "user loggedout successfully",
-        success : true
+        success : true,
+        message : "user loggedout successfully"
     })
 }

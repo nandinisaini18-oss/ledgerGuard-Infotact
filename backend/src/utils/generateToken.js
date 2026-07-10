@@ -15,8 +15,8 @@ function createToken(res , user , message , statusCode){
     })
 
     res.status(statusCode).json({
-        message ,
         success : true,
+        message ,
         user: {
             id: user._id,
             fullname: user.fullname,

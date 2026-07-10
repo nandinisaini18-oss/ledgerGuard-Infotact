@@ -4,12 +4,17 @@ export async function registerCompany(req , res){
     const {companyName , companyEmail , subscriptionPlan } = req.body
 
     try{
-        const isCompanyExists = await companyModel.findOne({companyEmail})
+         const isCompanyExists = await companyModel.findOne({
+            $or: [
+                { companyEmail },
+                { companyName }
+            ]
+        })
 
         if(isCompanyExists){
             return res.status(409).json({
-                message : "company already exists",
-                success : false
+                success : false,
+                message : "company already exists"
             })
         }
 
