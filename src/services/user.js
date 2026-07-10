@@ -11,3 +11,7 @@ export function loginUser(data) {
 export function logoutUser() {
   return api.post('/api/auth/user/logout')
 }
+
+export function getMe() {
+  return api.get('/api/auth/user/get-me')
+}

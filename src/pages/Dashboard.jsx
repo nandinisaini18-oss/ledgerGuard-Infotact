@@ -1,81 +1,85 @@
+"use client"
+
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import { logoutUser } from '../services/user'
+import Card from '../components/ui/Card'
 import Alert from '../components/ui/Alert'
 import Button from '../components/ui/Button'
-import { logoutUser } from '../services/user'
 
-function Dashboard() {
-  const [loading, setLoading] = useState(false)
-  const [submitError, setSubmitError] = useState('')
+const userFields = [
+  { label: 'Full Name', key: 'fullname' },
+  { label: 'Email', key: 'email' },
+  { label: 'Role', key: 'role' },
+  { label: 'Company ID', key: 'companyId' },
+]
+
+export default function Dashboard() {
+  const { user, loading, setUser } = useAuth()
   const navigate = useNavigate()
+  const [logoutError, setLogoutError] = useState('')
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
-  const handleLogout = async () => {
-    setLoading(true)
+  async function handleLogout() {
+    setLogoutError('')
+    setIsLoggingOut(true)
     try {
       await logoutUser()
+      setUser(null)
       navigate('/')
-    } catch (error) {
-      setSubmitError(error.message)
+    } catch {
+      setLogoutError('Something went wrong while logging out. Please try again.')
     } finally {
-      setLoading(false)
+      setIsLoggingOut(false)
     }
   }
 
-  if (submitError) {
-    return (
-      <div className="form-container">
-        <div className="form-container__header">
-          <h1 className="form-container__title">Error</h1>
-        </div>
-
-        <div className="form-container__body">
-          <Alert
-            variant="error"
-            title="Logout Failed"
-            message="An error occurred during logout. Please try again."
-          />
-        </div>
-
-        <div className="form-container__actions">
-          <Button variant="secondary" fullWidth onClick={() => navigate('/')}>Back to Home</Button>
-        </div>
-      </div>
-    )
+  if (loading) {
+    return null
   }
 
   return (
     <div className="form-container">
       <div className="form-container__header">
         <h1 className="form-container__title">Dashboard</h1>
-        <p className="form-container__subtitle">Login Successful</p>
+        <p className="form-container__subtitle">Welcome, {user?.fullname}</p>
       </div>
 
       <div className="form-container__body">
-        <Alert
-          variant="success"
-          title="Login Successful"
-          message="You have been logged in successfully."
-        />
-      </div>
+        {logoutError && (
+          <div style={{ marginBottom: 'var(--space-5)' }}>
+            <Alert variant="error" message={logoutError} />
+          </div>
+        )}
 
-      <div className="form-container__actions">
-        <Button
-          variant="primary"
-          fullWidth
-          loading={loading}
-          disabled={loading}
-          onClick={handleLogout}
-        >
-          Logout
-        </Button>
-        <Link to="/">
-          <Button variant="secondary" fullWidth>
-            Back to Home
+        <Card>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+            {userFields.map(({ label, key }) => (
+              <div key={key}>
+                <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-gray-500)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 'var(--space-1)' }}>
+                  {label}
+                </p>
+                <p style={{ fontSize: '0.9375rem', color: 'var(--color-gray-900)' }}>
+                  {user?.[key] || '\u2014'}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <div className="form-container__actions">
+          <Button
+            variant="primary"
+            fullWidth
+            loading={isLoggingOut}
+            disabled={isLoggingOut}
+            onClick={handleLogout}
+          >
+            Logout
           </Button>
-        </Link>
+        </div>
       </div>
     </div>
   )
 }
-
-export default Dashboard

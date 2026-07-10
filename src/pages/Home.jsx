@@ -56,17 +56,7 @@ function Home() {
         <div className="home__hero-actions">
           <Link to="/register-company">
             <Button variant="primary" size="lg">
-              Register Company
-            </Button>
-          </Link>
-          <Link to="/register-user">
-            <Button variant="secondary" size="lg">
-              Create Account
-            </Button>
-          </Link>
-          <Link to="/login">
-            <Button variant="ghost" size="lg">
-              Login
+              Get Started →
             </Button>
           </Link>
         </div>

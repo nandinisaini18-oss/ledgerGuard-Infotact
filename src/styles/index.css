@@ -262,6 +262,100 @@ p {
   color: var(--color-navy-900);
 }
 
+.navbar__user-name {
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-navy-600);
+}
+
+.navbar__logout {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-red-600);
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.navbar__logout:hover {
+  color: var(--color-red-900);
+  background: var(--color-red-50);
+}
+
+/* ===== Dashboard Header ===== */
+
+.dashboard-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(248, 250, 252, 0.85);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.dashboard-header__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+}
+
+.dashboard-header__title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-navy-900);
+  letter-spacing: -0.01em;
+}
+
+.dashboard-header__user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.dashboard-header__name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-navy-600);
+}
+
+.dashboard-header__logout {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-red-600);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.dashboard-header__logout:hover {
+  color: var(--color-red-900);
+  background: var(--color-red-50);
+}
+
+.dashboard-main {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--space-10) var(--space-6);
+}
+
 @media (max-width: 768px) {
   .navbar__links {
     display: none;

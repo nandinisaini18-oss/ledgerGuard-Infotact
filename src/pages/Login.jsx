@@ -6,6 +6,7 @@ import Button from '../components/ui/Button'
 import Alert from '../components/ui/Alert'
 import { loginUser } from '../services/user'
 import { validateRequired, validateEmail, validateForm } from '../utils/validators'
+import { useAuth } from '../context'
 
 const initialForm = {
   email: '',
@@ -17,6 +18,7 @@ function Login() {
   const [errors, setErrors] = useState({})
   const [submitError, setSubmitError] = useState('')
   const [loading, setLoading] = useState(false)
+  const { setUser } = useAuth()
   const navigate = useNavigate()
 
   function handleChange(e) {
@@ -45,7 +47,10 @@ function Login() {
 
     setLoading(true)
     try {
-      await loginUser(form)
+      const response = await loginUser(form)
+      if (response.data?.success && response.data?.user) {
+        setUser(response.data.user)
+      }
       navigate('/dashboard')
     } catch (err) {
       setSubmitError(err.message)
