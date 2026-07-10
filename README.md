@@ -1,4 +1,19 @@
 # ledgerGuard-Infotact
+LedgerGuard is a multi-tenant ledger management system where companies can register, manage employees, and securely track financial transactions. The backend is built with Node.js, Express, MongoDB, JWT Authentication, and follows a layered architecture.
+
+
+## Tech Stack
+
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- JWT
+- bcrypt
+- express-validator
+- cookie-parser
+- cors
+
 
 ### Day 1
 #### Completed
@@ -66,3 +81,38 @@
 - Role-based authorization (Admin/Employee)
 - Ledger and Transaction schema design
 - CRUD APIs for Ledger module
+
+
+
+## Day 4
+### Completed
+- Added request validation using express-validator
+- Created reusable validation middleware
+- Added user registration validation
+- Added user login validation
+- Added company registration validation
+- Implemented role-based authorization middleware
+- Improved duplicate company check using company name and email
+- Centralized CLIENT_URL using config
+- Refactored routes to use validation middleware
+- Improved API response consistency
+- Cleaned up authentication flow
+### Tested
+- User registration validation
+- User login validation
+- Company registration validation
+- Invalid request handling
+- Duplicate company name
+- Duplicate company email
+- Authorization middleware
+### Learned
+- Request validation with express-validator
+- Building reusable middleware
+- Role-based authorization
+- Validation pipeline in Express
+- Cleaner backend architecture
+### Next Goal
+- Design Transaction schema
+- Build Transaction CRUD APIs
+- Implement role-based access for transactions
+- Add filtering and pagination
