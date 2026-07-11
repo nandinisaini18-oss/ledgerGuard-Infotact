@@ -116,3 +116,33 @@ LedgerGuard is a multi-tenant ledger management system where companies can regis
 - Build Transaction CRUD APIs
 - Implement role-based access for transactions
 - Add filtering and pagination
+
+
+
+## Day 5
+
+### Completed
+- Designed Transaction schema
+- Added Transaction model
+- Created transaction request validation using express-validator
+- Added validation rules for title, amount, type, category, and description
+- Structured transaction module for upcoming CRUD implementation
+
+### Tested
+- Valid transaction payload
+- Missing required fields
+- Invalid transaction type
+- Invalid amount
+- Empty title/category validation
+
+### Learned
+- Designing scalable database schemas
+- Validating request payloads using express-validator
+- Separating schema design from business logic
+- Planning backend modules before implementing CRUD APIs
+
+### Next Goal
+- Create Transaction API
+- Protect Transaction routes using authentication middleware
+- Implement Get Transactions API
+- Restrict transactions based on companyId
