@@ -51,7 +51,7 @@ function Login() {
       if (response.data?.success && response.data?.user) {
         setUser(response.data.user)
       }
-      navigate('/dashboard')
+      navigate('/')
     } catch (err) {
       setSubmitError(err.message)
     } finally {
