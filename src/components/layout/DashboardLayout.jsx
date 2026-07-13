@@ -1,11 +1,11 @@
 "use client"
 
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Outlet } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { logoutUser } from '../../services/user'
 import Logo from '../ui/Logo'
 
-export default function DashboardLayout({ children }) {
+export default function DashboardLayout() {
   const { user, setUser } = useAuth()
   const navigate = useNavigate()
 
@@ -34,7 +34,7 @@ export default function DashboardLayout({ children }) {
         </div>
       </header>
       <main className="dashboard-main">
-        {children}
+        <Outlet />
       </main>
     </div>
   )

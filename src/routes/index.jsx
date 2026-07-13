@@ -8,6 +8,8 @@ import CompanyRegistration from '../pages/CompanyRegistration'
 import UserRegistration from '../pages/UserRegistration'
 import Login from '../pages/Login'
 import Dashboard from '../pages/Dashboard'
+import TransactionList from '../pages/TransactionList'
+import CreateTransaction from '../pages/CreateTransaction'
 import ProtectedRoute from '../components/ProtectedRoute'
 import { AuthProvider, useAuth } from '../context'
 
@@ -40,6 +42,17 @@ function AppRoutesInner() {
             <Route path="/register-company" element={<Navigate to="/" replace />} />
             <Route path="/register-user" element={<Navigate to="/" replace />} />
             <Route path="/login" element={<Navigate to="/" replace />} />
+<Route
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/transactions" element={<TransactionList />} />
+              <Route path="/transactions/new" element={<CreateTransaction />} />
+            </Route>
           </>
         ) : (
           <Route element={<PublicLayout />}>
@@ -47,18 +60,9 @@ function AppRoutesInner() {
             <Route path="/register-company" element={<CompanyRegistration />} />
             <Route path="/register-user" element={<UserRegistration />} />
             <Route path="/login" element={<Login />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
           </Route>
         )}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <Dashboard />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
       </Routes>
     </>
   )
