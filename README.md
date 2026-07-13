@@ -146,3 +146,41 @@ LedgerGuard is a multi-tenant ledger management system where companies can regis
 - Protect Transaction routes using authentication middleware
 - Implement Get Transactions API
 - Restrict transactions based on companyId
+
+
+
+## Day 6
+
+### Completed
+- Designed Transaction CRUD module
+- Implemented Create Transaction API
+- Implemented Get All Transactions API
+- Implemented Get Single Transaction API
+- Implemented Update Transaction API
+- Implemented Delete Transaction API
+- Added company-level data isolation for all transaction operations
+- Connected Transaction routes with Express application
+- Protected Transaction APIs using authentication middleware
+
+### Tested
+- Create transaction
+- Get all transactions
+- Get transaction by ID
+- Update transaction
+- Delete transaction
+- Invalid transaction ID
+- Unauthorized access
+- Company ownership verification
+
+### Learned
+- Building complete RESTful CRUD APIs
+- Securing multi-tenant data using company-based authorization
+- Updating MongoDB documents safely
+- Organizing scalable Express controllers and routes
+- Designing backend modules using MVC architecture
+
+### Next Goal
+- Implement role-based authorization for Transaction APIs
+- Add pagination, filtering, and search
+- Populate transaction creator details
+- Refactor controller logic for better code reuse
