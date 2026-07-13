@@ -27,7 +27,6 @@ export default function AuthenticatedHome() {
         <div className="dashboard-header__inner">
           <Logo />
           <div className="dashboard-header__user">
-            <span className="dashboard-header__name">{user?.fullname}</span>
             <button className="dashboard-header__logout" onClick={handleLogout}>
               Logout
             </button>
@@ -83,13 +82,6 @@ export default function AuthenticatedHome() {
               onClick={() => navigate('/dashboard')}
             >
               Go to Dashboard
-            </Button>
-            <Button
-              variant="ghost"
-              size="md"
-              onClick={handleLogout}
-            >
-              Sign out
             </Button>
           </div>
         </div>

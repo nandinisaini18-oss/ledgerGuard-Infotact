@@ -6,7 +6,7 @@ import { logoutUser } from '../../services/user'
 import Logo from '../ui/Logo'
 
 export default function DashboardLayout() {
-  const { user, setUser } = useAuth()
+  const { setUser } = useAuth()
   const navigate = useNavigate()
 
   async function handleLogout() {
@@ -25,12 +25,14 @@ export default function DashboardLayout() {
         <div className="dashboard-header__inner">
           <Logo />
           <h1 className="dashboard-header__title">Dashboard</h1>
-          <div className="dashboard-header__user">
-            <span className="dashboard-header__name">{user?.fullname}</span>
-            <button className="dashboard-header__logout" onClick={handleLogout}>
-              Logout
-            </button>
-          </div>
+          <button className="dashboard-header__logout" onClick={handleLogout}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Logout
+          </button>
         </div>
       </header>
       <main className="dashboard-main">

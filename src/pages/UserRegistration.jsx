@@ -112,7 +112,7 @@ function UserRegistration() {
             type="button"
             onClick={handleRegisterAnother}
             className="btn btn--primary btn--full-width"
-            style={{ marginBottom: 'var(--space-4)' }}
+            style={{ padding:"10px 0px" }}
           >
             Register Another User
           </button>

@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { getTransactions } from '../services/transaction'
+import { Link, useLocation } from 'react-router-dom'
+import { getTransactions, deleteTransaction } from '../services/transaction'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import Alert from '../components/ui/Alert'
 import EmptyState from '../components/ui/EmptyState'
+import Modal from '../components/ui/Modal'
 
 const typeIcons = {
   income: (
@@ -21,7 +22,7 @@ const typeIcons = {
   ),
 }
 
-function TransactionRow({ transaction }) {
+function TransactionRow({ transaction, onDelete }) {
   const isIncome = transaction.type === 'income'
   const formattedDate = new Date(transaction.createdAt).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -59,18 +60,35 @@ function TransactionRow({ transaction }) {
         </time>
       </td>
       <td className="transaction-table__cell">
-        <Link to={`/transactions/${transaction._id}`} className="transaction-table__action">
-          View
-        </Link>
+        <div className="transaction-table__actions">
+          <Link to={`/transactions/${transaction._id}/edit`} className="transaction-table__action">
+            Edit
+          </Link>
+          <Link to={`/transactions/${transaction._id}`} className="transaction-table__action">
+            View
+          </Link>
+          <button
+            type="button"
+            className="transaction-table__action transaction-table__action--danger"
+            onClick={() => onDelete(transaction)}
+          >
+            Delete
+          </button>
+        </div>
       </td>
     </tr>
   )
 }
 
 export default function TransactionList() {
+  const location = useLocation()
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [flash, setFlash] = useState(location.state?.fromEdit ? 'Transaction updated successfully' : '')
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [transactionToDelete, setTransactionToDelete] = useState(null)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     async function fetchTransactions() {
@@ -93,6 +111,43 @@ export default function TransactionList() {
     fetchTransactions()
   }, [])
 
+  useEffect(() => {
+    if (!flash) return
+    const timer = setTimeout(() => setFlash(''), 5000)
+    return () => clearTimeout(timer)
+  }, [flash])
+
+  function handleDeleteClick(transaction) {
+    setTransactionToDelete(transaction)
+    setDeleteDialogOpen(true)
+  }
+
+  async function handleConfirmDelete() {
+    if (!transactionToDelete) return
+
+    setDeleting(true)
+    try {
+      const response = await deleteTransaction(transactionToDelete._id)
+      if (response.data?.success) {
+        setTransactions((prev) => prev.filter((t) => t._id !== transactionToDelete._id))
+        setFlash('Transaction deleted successfully')
+      } else {
+        setError('Failed to delete transaction')
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to delete transaction')
+    } finally {
+      setDeleting(false)
+      setDeleteDialogOpen(false)
+      setTransactionToDelete(null)
+    }
+  }
+
+  function handleCancelDelete() {
+    setDeleteDialogOpen(false)
+    setTransactionToDelete(null)
+  }
+
   if (loading) {
     return (
       <div className="transaction-list__loading">
@@ -114,6 +169,12 @@ export default function TransactionList() {
           <Button variant="primary">New Transaction</Button>
         </Link>
       </div>
+
+      {flash && (
+        <div className="transaction-list__flash" role="status">
+          <Alert variant="success" message={flash} />
+        </div>
+      )}
 
       {error && (
         <div className="transaction-list__error" role="alert">
@@ -155,13 +216,46 @@ export default function TransactionList() {
               </thead>
               <tbody>
                 {transactions.map((transaction) => (
-                  <TransactionRow key={transaction._id} transaction={transaction} />
+                  <TransactionRow
+                    key={transaction._id}
+                    transaction={transaction}
+                    onDelete={handleDeleteClick}
+                  />
                 ))}
               </tbody>
             </table>
           </div>
         </Card>
       )}
+
+      <Modal
+        isOpen={deleteDialogOpen}
+        onClose={handleCancelDelete}
+        title="Delete Transaction"
+        size="sm"
+      >
+        <div className="delete-dialog">
+          <p className="delete-dialog__message">
+            Are you sure you want to permanently delete this transaction?
+          </p>
+          <p className="delete-dialog__warning">This action cannot be undone.</p>
+          <div className="delete-dialog__transaction-info">
+            <span className="delete-dialog__label">Transaction:</span>
+            <span className="delete-dialog__title">{transactionToDelete?.title}</span>
+            <span className={`delete-dialog__amount ${transactionToDelete?.type === 'income' ? 'income' : 'expense'}`}>
+              {transactionToDelete?.type === 'income' ? '+' : '-'}${transactionToDelete?.amount.toFixed(2)}
+            </span>
+          </div>
+          <div className="modal__actions">
+            <Button variant="secondary" onClick={handleCancelDelete} disabled={deleting}>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={handleConfirmDelete} loading={deleting} disabled={deleting}>
+              Delete
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

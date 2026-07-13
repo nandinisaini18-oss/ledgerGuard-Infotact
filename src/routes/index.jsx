@@ -10,6 +10,8 @@ import Login from '../pages/Login'
 import Dashboard from '../pages/Dashboard'
 import TransactionList from '../pages/TransactionList'
 import CreateTransaction from '../pages/CreateTransaction'
+import EditTransaction from '../pages/EditTransaction'
+import ViewTransaction from '../pages/ViewTransaction'
 import ProtectedRoute from '../components/ProtectedRoute'
 import { AuthProvider, useAuth } from '../context'
 
@@ -42,7 +44,7 @@ function AppRoutesInner() {
             <Route path="/register-company" element={<Navigate to="/" replace />} />
             <Route path="/register-user" element={<Navigate to="/" replace />} />
             <Route path="/login" element={<Navigate to="/" replace />} />
-<Route
+            <Route
               element={
                 <ProtectedRoute>
                   <DashboardLayout />
@@ -52,6 +54,8 @@ function AppRoutesInner() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/transactions" element={<TransactionList />} />
               <Route path="/transactions/new" element={<CreateTransaction />} />
+              <Route path="/transactions/:id" element={<ViewTransaction />} />
+              <Route path="/transactions/:id/edit" element={<EditTransaction />} />
             </Route>
           </>
         ) : (
