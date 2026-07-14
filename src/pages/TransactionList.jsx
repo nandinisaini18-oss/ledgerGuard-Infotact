@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { getTransactions, deleteTransaction } from '../services/transaction'
+import useIsAdmin from '../hooks/useIsAdmin'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import Alert from '../components/ui/Alert'
@@ -22,7 +23,7 @@ const typeIcons = {
   ),
 }
 
-function TransactionRow({ transaction, onDelete }) {
+function TransactionRow({ transaction, onDelete, isAdmin }) {
   const isIncome = transaction.type === 'income'
   const formattedDate = new Date(transaction.createdAt).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -61,19 +62,23 @@ function TransactionRow({ transaction, onDelete }) {
       </td>
       <td className="transaction-table__cell">
         <div className="transaction-table__actions">
-          <Link to={`/transactions/${transaction._id}/edit`} className="transaction-table__action">
-            Edit
-          </Link>
+          {isAdmin && (
+            <Link to={`/transactions/${transaction._id}/edit`} className="transaction-table__action">
+              Edit
+            </Link>
+          )}
           <Link to={`/transactions/${transaction._id}`} className="transaction-table__action">
             View
           </Link>
-          <button
-            type="button"
-            className="transaction-table__action transaction-table__action--danger"
-            onClick={() => onDelete(transaction)}
-          >
-            Delete
-          </button>
+          {isAdmin && (
+            <button
+              type="button"
+              className="transaction-table__action transaction-table__action--danger"
+              onClick={() => onDelete(transaction)}
+            >
+              Delete
+            </button>
+          )}
         </div>
       </td>
     </tr>
@@ -82,10 +87,19 @@ function TransactionRow({ transaction, onDelete }) {
 
 export default function TransactionList() {
   const location = useLocation()
+  const isAdmin = useIsAdmin()
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [flash, setFlash] = useState(location.state?.fromEdit ? 'Transaction updated successfully' : '')
+  const [flash, setFlash] = useState(
+    location.state?.fromEdit
+      ? 'Transaction updated successfully'
+      : location.state?.permissionDenied
+        ? location.state?.message
+        : location.state?.fromDelete
+          ? location.state?.message
+          : ''
+  )
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [transactionToDelete, setTransactionToDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
@@ -165,14 +179,16 @@ export default function TransactionList() {
             View and manage all transactions for your company
           </p>
         </div>
-        <Link to="/transactions/new">
-          <Button variant="primary">New Transaction</Button>
-        </Link>
+        {isAdmin && (
+          <Link to="/transactions/new">
+            <Button variant="primary">New Transaction</Button>
+          </Link>
+        )}
       </div>
 
       {flash && (
         <div className="transaction-list__flash" role="status">
-          <Alert variant="success" message={flash} />
+          <Alert variant={location.state?.permissionDenied ? 'warning' : 'success'} message={flash} />
         </div>
       )}
 
@@ -192,11 +208,13 @@ export default function TransactionList() {
               </svg>
             }
             title="No transactions yet"
-            description="Get started by creating your first transaction."
+            description={isAdmin ? 'Get started by creating your first transaction.' : 'Transactions will appear here once an admin creates them.'}
             action={
-              <Link to="/transactions/new">
-                <Button variant="primary">Create Transaction</Button>
-              </Link>
+              isAdmin ? (
+                <Link to="/transactions/new">
+                  <Button variant="primary">Create Transaction</Button>
+                </Link>
+              ) : null
             }
           />
         </Card>
@@ -211,7 +229,9 @@ export default function TransactionList() {
                   <th scope="col" className="transaction-table__header-cell">Amount</th>
                   <th scope="col" className="transaction-table__header-cell">Type</th>
                   <th scope="col" className="transaction-table__header-cell">Date</th>
-                  <th scope="col" className="transaction-table__header-cell">Actions</th>
+                  {isAdmin && (
+                    <th scope="col" className="transaction-table__header-cell">Actions</th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -220,6 +240,7 @@ export default function TransactionList() {
                     key={transaction._id}
                     transaction={transaction}
                     onDelete={handleDeleteClick}
+                    isAdmin={isAdmin}
                   />
                 ))}
               </tbody>

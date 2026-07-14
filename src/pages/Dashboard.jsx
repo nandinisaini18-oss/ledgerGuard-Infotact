@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import useIsAdmin from '../hooks/useIsAdmin'
 import { logoutUser } from '../services/user'
 import { getTransactions } from '../services/transaction'
 import Button from '../components/ui/Button'
@@ -26,6 +27,7 @@ const typeIcons = {
 
 export default function Dashboard() {
   const { user, setUser } = useAuth()
+  const isAdmin = useIsAdmin()
   const navigate = useNavigate()
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(true)
@@ -83,21 +85,23 @@ export default function Dashboard() {
       <section className="dash__section">
         <h2 className="dash__section-title">Quick Actions</h2>
         <div className="dash__actions-grid">
-          <Link to="/transactions/new" className="dash__action-card">
-            <div className="dash__action-icon dash__action-icon--primary">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
+          {isAdmin && (
+            <Link to="/transactions/new" className="dash__action-card">
+              <div className="dash__action-icon dash__action-icon--primary">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+              </div>
+              <div className="dash__action-text">
+                <h3 className="dash__action-title">New Transaction</h3>
+                <p className="dash__action-desc">Record an income or expense entry</p>
+              </div>
+              <svg className="dash__action-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polyline points="9 18 15 12 9 6" />
               </svg>
-            </div>
-            <div className="dash__action-text">
-              <h3 className="dash__action-title">New Transaction</h3>
-              <p className="dash__action-desc">Record an income or expense entry</p>
-            </div>
-            <svg className="dash__action-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </Link>
+            </Link>
+          )}
 
           <Link to="/transactions" className="dash__action-card">
             <div className="dash__action-icon dash__action-icon--secondary">
@@ -193,10 +197,16 @@ export default function Dashboard() {
               </svg>
             </div>
             <h3 className="dash__empty-title">No transactions yet</h3>
-            <p className="dash__empty-desc">Create your first transaction to get started.</p>
-            <Link to="/transactions/new">
-              <Button variant="primary" size="sm">Create Transaction</Button>
-            </Link>
+            <p className="dash__empty-desc">
+              {isAdmin
+                ? 'Create your first transaction to get started.'
+                : 'Transactions will appear here once an admin creates them.'}
+            </p>
+            {isAdmin && (
+              <Link to="/transactions/new">
+                <Button variant="primary" size="sm">Create Transaction</Button>
+              </Link>
+            )}
           </Card>
         ) : (
           <Card className="dash__recent-card">

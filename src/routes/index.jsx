@@ -13,6 +13,7 @@ import CreateTransaction from '../pages/CreateTransaction'
 import EditTransaction from '../pages/EditTransaction'
 import ViewTransaction from '../pages/ViewTransaction'
 import ProtectedRoute from '../components/ProtectedRoute'
+import AdminRoute from '../components/AdminRoute'
 import { AuthProvider, useAuth } from '../context'
 
 function PublicLayout() {
@@ -53,9 +54,9 @@ function AppRoutesInner() {
             >
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/transactions" element={<TransactionList />} />
-              <Route path="/transactions/new" element={<CreateTransaction />} />
+              <Route path="/transactions/new" element={<AdminRoute><CreateTransaction /></AdminRoute>} />
               <Route path="/transactions/:id" element={<ViewTransaction />} />
-              <Route path="/transactions/:id/edit" element={<EditTransaction />} />
+              <Route path="/transactions/:id/edit" element={<AdminRoute><EditTransaction /></AdminRoute>} />
             </Route>
           </>
         ) : (

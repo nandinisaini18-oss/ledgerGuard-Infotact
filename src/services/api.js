@@ -17,6 +17,7 @@ api.interceptors.response.use(
       const message =
         data?.message ||
         data?.error ||
+        (status === 403 && 'You do not have permission to perform this action.') ||
         (status === 409 && 'Resource already exists.') ||
         (status === 400 && 'Invalid request. Please check your input.') ||
         (status === 404 && 'The requested resource was not found.') ||

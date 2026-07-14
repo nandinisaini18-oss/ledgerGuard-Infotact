@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { getTransactionById, deleteTransaction } from '../services/transaction'
 import { useAuth } from '../context'
+import useIsAdmin from '../hooks/useIsAdmin'
 import Button from '../components/ui/Button'
 import Alert from '../components/ui/Alert'
 import Spinner from '../components/ui/Spinner'
@@ -49,6 +50,7 @@ export default function ViewTransaction() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
+  const isAdmin = useIsAdmin()
   const [transaction, setTransaction] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -175,22 +177,26 @@ export default function ViewTransaction() {
           <span className="vt-header__current">{transaction.title}</span>
         </div>
         <div className="vt-header__actions">
-          <Link to={`/transactions/${transaction._id}/edit`}>
-            <Button variant="secondary" size="sm">
+          {isAdmin && (
+            <Link to={`/transactions/${transaction._id}/edit`}>
+              <Button variant="secondary" size="sm">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                  <path d="m15 5 4 4" />
+                </svg>
+                Edit
+              </Button>
+            </Link>
+          )}
+          {isAdmin && (
+            <Button variant="ghost" size="sm" onClick={handleDeleteClick} className="vt-header__delete-btn">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                <path d="m15 5 4 4" />
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
               </svg>
-              Edit
+              Delete
             </Button>
-          </Link>
-          <Button variant="ghost" size="sm" onClick={handleDeleteClick} className="vt-header__delete-btn">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <polyline points="3 6 5 6 21 6" />
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-            </svg>
-            Delete
-          </Button>
+          )}
         </div>
       </header>
 
