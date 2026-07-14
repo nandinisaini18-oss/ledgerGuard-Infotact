@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { authorizeRoles } from "../middlewares/role.middleware.js";
 
 import {
     createTransaction,
@@ -17,11 +18,11 @@ const transactionRouter = Router();
 transactionRouter.post(
     "/",
     authenticateUser,
+    authorizeRoles("admin"),
     transactionValidation,
     validate,
     createTransaction
 );
-
 transactionRouter.get(
     "/",
     authenticateUser,
@@ -37,6 +38,7 @@ transactionRouter.get(
 transactionRouter.put(
     "/:id",
     authenticateUser,
+    authorizeRoles("admin"),
     transactionValidation,
     validate,
     updateTransaction
@@ -45,6 +47,7 @@ transactionRouter.put(
 transactionRouter.delete(
     "/:id",
     authenticateUser,
+    authorizeRoles("admin"),
     deleteTransaction
 );
 
