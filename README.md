@@ -184,3 +184,22 @@ LedgerGuard is a multi-tenant ledger management system where companies can regis
 - Add pagination, filtering, and search
 - Populate transaction creator details
 - Refactor controller logic for better code reuse
+
+
+
+## Day 7
+### Completed
+- Applied role-based authorization to Transaction APIs
+- Restricted create, update, and delete operations to admin users
+- Kept read operations accessible to authenticated users
+### Tested
+- Admin access to Transaction CRUD
+- Unauthorized access by non-admin users
+- Access control responses
+### Learned
+- Implementing role-based access control (RBAC)
+- Securing REST APIs using authorization middleware
+### Next Goal
+- Add pagination and filtering to transactions
+- Populate transaction creator details
+- Refactor transaction controller
