@@ -29,15 +29,32 @@ export default function Dashboard() {
   const { user, setUser } = useAuth()
   const isAdmin = useIsAdmin()
   const navigate = useNavigate()
-  const [transactions, setTransactions] = useState([])
+  const [recentTransactions, setRecentTransactions] = useState([])
+  const [totalCount, setTotalCount] = useState(0)
+  const [incomeCount, setIncomeCount] = useState(0)
+  const [expenseCount, setExpenseCount] = useState(0)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    async function fetchTransactions() {
+    async function fetchDashboardData() {
       try {
-        const response = await getTransactions()
-        if (response.data?.success && response.data?.transactions) {
-          setTransactions(response.data.transactions)
+        const [recentRes, incomeRes, expenseRes] = await Promise.all([
+          getTransactions({ page: 1, limit: 5 }),
+          getTransactions({ page: 1, limit: 1, type: 'income' }),
+          getTransactions({ page: 1, limit: 1, type: 'expense' }),
+        ])
+
+        if (recentRes.data?.success) {
+          setRecentTransactions(recentRes.data.transactions || [])
+          setTotalCount(recentRes.data.totalTransactions || 0)
+        }
+
+        if (incomeRes.data?.success) {
+          setIncomeCount(incomeRes.data.totalTransactions || 0)
+        }
+
+        if (expenseRes.data?.success) {
+          setExpenseCount(expenseRes.data.totalTransactions || 0)
         }
       } catch {
         // Silent fail — dashboard still renders user data
@@ -46,7 +63,7 @@ export default function Dashboard() {
       }
     }
 
-    fetchTransactions()
+    fetchDashboardData()
   }, [])
 
   async function handleLogout() {
@@ -58,11 +75,6 @@ export default function Dashboard() {
       // Logout failed
     }
   }
-
-  const totalCount = transactions.length
-  const incomeCount = transactions.filter((t) => t.type === 'income').length
-  const expenseCount = transactions.filter((t) => t.type === 'expense').length
-  const recentTransactions = transactions.slice(0, 5)
 
   return (
     <div className="dash">

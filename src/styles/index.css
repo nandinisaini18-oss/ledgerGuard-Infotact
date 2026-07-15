@@ -1552,6 +1552,56 @@ select.form-field__input.form-field--error:focus,
   padding: 0;
 }
 
+/* ===== Transaction Filters ===== */
+
+.transaction-list__filters {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  background: #fff;
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+}
+
+.transaction-list__filter {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.transaction-list__filter-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.transaction-list__filter-select,
+.transaction-list__filter-input {
+  min-width: 160px;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 640px) {
+  .transaction-list__filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+    padding: var(--space-4);
+  }
+
+  .transaction-list__filter-select,
+  .transaction-list__filter-input {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
 /* ===== Transaction Table ===== */
 
 .transaction-table-container {
@@ -1779,6 +1829,111 @@ select.form-field__input.form-field--error:focus,
 
 .delete-dialog__amount.expense {
   color: var(--color-error);
+}
+
+/* ===== Pagination ===== */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.pagination__info {
+  font-size: 0.8125rem;
+  color: var(--color-gray-500);
+}
+
+.pagination__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pagination__btn {
+  padding: 7px 14px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-gray-700);
+  background: #fff;
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.pagination__btn:hover:not(:disabled) {
+  background: var(--color-gray-50);
+  border-color: var(--color-gray-400);
+}
+
+.pagination__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination__pages {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.pagination__page {
+  min-width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-2);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-gray-600);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.pagination__page:hover:not(.pagination__page--active) {
+  background: var(--color-gray-100);
+  color: var(--color-gray-900);
+}
+
+.pagination__page--active {
+  background: var(--color-blue-600);
+  color: #fff;
+  border-color: var(--color-blue-600);
+  cursor: default;
+}
+
+.pagination__ellipsis {
+  min-width: 34px;
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--color-gray-400);
+  user-select: none;
+}
+
+@media (max-width: 640px) {
+  .pagination {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+  }
+
+  .pagination__info {
+    text-align: center;
+  }
+
+  .pagination__controls {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
 }
 
 /* ===== View Transaction (Redesigned) ===== */
@@ -2317,6 +2472,7 @@ select.form-field__input.form-field--error:focus,
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
+  min-height: 28px;
 }
 
 .dash__section-link {
@@ -2354,6 +2510,7 @@ select.form-field__input.form-field--error:focus,
   box-shadow: var(--shadow-sm);
   transition: all var(--transition);
   cursor: pointer;
+  text-decoration: none;
 }
 
 .dash__action-card:hover {
@@ -2558,11 +2715,15 @@ select.form-field__input.form-field--error:focus,
   }
 
   .dash__stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .dash__greeting {
     font-size: 1.375rem;
+  }
+
+  .dash__table-link {
+    color: var(--color-blue-600);
   }
 }
 
@@ -2577,5 +2738,13 @@ select.form-field__input.form-field--error:focus,
 
   .dash__stat-card {
     padding: var(--space-4) var(--space-5);
+  }
+
+  .dash__stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dash__stat-value {
+    font-size: 1.25rem;
   }
 }

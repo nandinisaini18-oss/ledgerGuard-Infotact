@@ -4,8 +4,16 @@ export function createTransaction(data) {
   return api.post('/api/transactions', data)
 }
 
-export function getTransactions() {
-  return api.get('/api/transactions')
+export function getTransactions({ page, limit, type, category } = {}) {
+  const params = new URLSearchParams()
+
+  if (page != null) params.append('page', page)
+  if (limit != null) params.append('limit', limit)
+  if (type) params.append('type', type)
+  if (category) params.append('category', category)
+
+  const query = params.toString()
+  return api.get(`/api/transactions${query ? `?${query}` : ''}`)
 }
 
 export function getTransactionById(id) {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { getTransactions, deleteTransaction } from '../services/transaction'
 import useIsAdmin from '../hooks/useIsAdmin'
@@ -7,6 +7,7 @@ import Card from '../components/ui/Card'
 import Alert from '../components/ui/Alert'
 import EmptyState from '../components/ui/EmptyState'
 import Modal from '../components/ui/Modal'
+import { PageTitleSkeleton, FilterSectionSkeleton, TransactionTableSkeleton, PaginationSkeleton } from '../components/ui/Skeleton'
 
 const typeIcons = {
   income: (
@@ -103,15 +104,50 @@ export default function TransactionList() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [transactionToDelete, setTransactionToDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
+  const [filterType, setFilterType] = useState('')
+  const [filterCategory, setFilterCategory] = useState('')
+  const [debouncedCategory, setDebouncedCategory] = useState('')
+  const debounceTimer = useRef(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [limit, setLimit] = useState(10)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalTransactions, setTotalTransactions] = useState(0)
+  const [filterLoading, setFilterLoading] = useState(false)
+  const hasLoaded = useRef(false)
+
+  const handleCategoryChange = useCallback((e) => {
+    const value = e.target.value
+    setFilterCategory(value)
+    clearTimeout(debounceTimer.current)
+    debounceTimer.current = setTimeout(() => setDebouncedCategory(value), 400)
+  }, [])
+
+  useEffect(() => {
+    return () => clearTimeout(debounceTimer.current)
+  }, [])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [filterType, debouncedCategory, limit])
 
   useEffect(() => {
     async function fetchTransactions() {
-      setLoading(true)
+      if (!hasLoaded.current) {
+        setLoading(true)
+      } else {
+        setFilterLoading(true)
+      }
       setError('')
       try {
-        const response = await getTransactions()
+        const params = { page: currentPage, limit }
+        if (filterType) params.type = filterType
+        if (debouncedCategory) params.category = debouncedCategory
+        const response = await getTransactions(params)
         if (response.data?.success && response.data?.transactions) {
           setTransactions(response.data.transactions)
+          setTotalPages(response.data.totalPages || 1)
+          setTotalTransactions(response.data.totalTransactions || 0)
+          hasLoaded.current = true
         } else {
           setError('Failed to load transactions')
         }
@@ -119,11 +155,12 @@ export default function TransactionList() {
         setError(err.message || 'An unexpected error occurred')
       } finally {
         setLoading(false)
+        setFilterLoading(false)
       }
     }
 
     fetchTransactions()
-  }, [])
+  }, [currentPage, limit, filterType, debouncedCategory])
 
   useEffect(() => {
     if (!flash) return
@@ -162,10 +199,15 @@ export default function TransactionList() {
     setTransactionToDelete(null)
   }
 
-  if (loading) {
+  const initialLoading = loading && !hasLoaded.current
+
+  if (initialLoading) {
     return (
-      <div className="transaction-list__loading">
-        <div className="spinner" role="status" aria-label="Loading transactions" />
+      <div className="transaction-list">
+        <PageTitleSkeleton isAdmin={isAdmin} />
+        <FilterSectionSkeleton />
+        <TransactionTableSkeleton isAdmin={isAdmin} />
+        <PaginationSkeleton />
       </div>
     )
   }
@@ -198,7 +240,49 @@ export default function TransactionList() {
         </div>
       )}
 
-      {transactions.length === 0 ? (
+      <div className="transaction-list__filters">
+        <div className="transaction-list__filter">
+          <label htmlFor="filter-type" className="transaction-list__filter-label">Type</label>
+          <select
+            id="filter-type"
+            className="form-field__input transaction-list__filter-select"
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+          >
+            <option value="">All</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+        </div>
+        <div className="transaction-list__filter">
+          <label htmlFor="filter-category" className="transaction-list__filter-label">Category</label>
+          <input
+            id="filter-category"
+            type="text"
+            className="form-field__input transaction-list__filter-input"
+            placeholder="Filter by category"
+            value={filterCategory}
+            onChange={handleCategoryChange}
+          />
+        </div>
+        <div className="transaction-list__filter">
+          <label htmlFor="filter-limit" className="transaction-list__filter-label">Per page</label>
+          <select
+            id="filter-limit"
+            className="form-field__input transaction-list__filter-select"
+            value={limit}
+            onChange={(e) => setLimit(Number(e.target.value))}
+          >
+            <option value={10}>10</option>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+          </select>
+        </div>
+      </div>
+
+      {filterLoading ? (
+        <TransactionTableSkeleton isAdmin={isAdmin} />
+      ) : transactions.length === 0 ? (
         <Card className="transaction-list__empty">
           <EmptyState
             icon={
@@ -247,6 +331,62 @@ export default function TransactionList() {
             </table>
           </div>
         </Card>
+      )}
+
+      {!filterLoading && totalPages > 1 && (
+        <div className="pagination">
+          <div className="pagination__info">
+            Page {currentPage} of {totalPages} ({totalTransactions} transactions)
+          </div>
+          <div className="pagination__controls">
+            <button
+              type="button"
+              className="pagination__btn"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((p) => p - 1)}
+            >
+              Previous
+            </button>
+            <div className="pagination__pages">
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter((p) => {
+                  if (totalPages <= 7) return true
+                  if (p === 1 || p === totalPages) return true
+                  if (Math.abs(p - currentPage) <= 1) return true
+                  return false
+                })
+                .reduce((acc, p, idx, arr) => {
+                  if (idx > 0 && p - arr[idx - 1] > 1) {
+                    acc.push('...')
+                  }
+                  acc.push(p)
+                  return acc
+                }, [])
+                .map((item, idx) =>
+                  item === '...' ? (
+                    <span key={`ellipsis-${idx}`} className="pagination__ellipsis">...</span>
+                  ) : (
+                    <button
+                      key={item}
+                      type="button"
+                      className={`pagination__page ${item === currentPage ? 'pagination__page--active' : ''}`}
+                      onClick={() => setCurrentPage(item)}
+                    >
+                      {item}
+                    </button>
+                  )
+                )}
+            </div>
+            <button
+              type="button"
+              className="pagination__btn"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((p) => p + 1)}
+            >
+              Next
+            </button>
+          </div>
+        </div>
       )}
 
       <Modal
