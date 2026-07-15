@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import transactionModel from "../models/transaction.model.js";
 
+
 /**
  * Create Transaction
  */
@@ -39,12 +40,45 @@ export async function createTransaction(req, res) {
 export async function getTransactions(req, res) {
     try {
 
+        // Read page and limit from query parameters
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+
+        const { type, category } = req.query;
+
+        const filter = {
+            companyId: req.user.companyId
+        };
+
+        if (type) {
+            filter.type = type;
+        }
+
+        if (category) {
+            filter.category = category;
+        }
+        // Calculate how many documents to skip
+        const skip = (page - 1) * limit;
+
+        // Count total transactions for this company
+        const totalTransactions = await transactionModel.countDocuments(filter);
+
+        // Fetch paginated transactions
         const transactions = await transactionModel
-            .find({ companyId: req.user.companyId })
-            .sort({ createdAt: -1 });
+            .find(filter)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);  
+
+        // Calculate total pages
+        const totalPages = Math.ceil(totalTransactions / limit);
 
         return res.status(200).json({
             success: true,
+            page,
+            limit,
+            totalTransactions,
+            totalPages,
             count: transactions.length,
             transactions
         });
@@ -59,16 +93,14 @@ export async function getTransactions(req, res) {
     }
 }
 
-
 /**
  * Get Single Transaction
  */
-export async function getTransaction(req, res) {
 
+export async function getTransaction(req, res) {
     const { id } = req.params;
 
     try {
-
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
                 success: false,
@@ -98,12 +130,10 @@ export async function getTransaction(req, res) {
         });
 
     } catch (err) {
-
         return res.status(500).json({
             success: false,
             message: "Internal server error"
         });
-
     }
 }
 
