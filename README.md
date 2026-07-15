@@ -15,6 +15,18 @@ LedgerGuard is a multi-tenant ledger management system where companies can regis
 - cors
 
 
+
+## Features
+- Company Registration
+- User Authentication (JWT + Cookies)
+- Company-based Multi-Tenant Data Isolation
+- Role-Based Access Control (Admin/User)
+- Transaction CRUD APIs
+- Request Validation using Express Validator
+- Pagination
+- Transaction Filtering (Type & Category)
+
+
 ### Day 1
 #### Completed
 - Initialized Express application
@@ -203,3 +215,31 @@ LedgerGuard is a multi-tenant ledger management system where companies can regis
 - Add pagination and filtering to transactions
 - Populate transaction creator details
 - Refactor transaction controller
+
+
+
+## Day 8
+### Completed
+- Implemented pagination for Transaction listing
+- Added transaction filtering by type (income/expense)
+- Added transaction filtering by category
+- Improved Transaction API response with pagination metadata
+- Refactored transaction query logic using dynamic filters
+### Tested
+- Admin access to Create/Update/Delete APIs
+- User access restrictions (403 Forbidden)
+- Pagination using `page` and `limit` query parameters
+- Filtering transactions by type
+- Filtering transactions by category
+- Combined filtering with pagination
+### Learned
+- Role-Based Access Control (RBAC) in Express
+- Dynamic MongoDB query building
+- Pagination using `skip()` and `limit()`
+- Query parameters (`req.query`)
+- Building scalable REST APIs
+### Next Goal
+- Search transactions by title
+- Sort transactions by amount/date
+- Dashboard analytics APIs (income, expense, balance)
+- Multi-tenant database architecture (separate database per company)
