@@ -243,3 +243,35 @@ LedgerGuard is a multi-tenant ledger management system where companies can regis
 - Sort transactions by amount/date
 - Dashboard analytics APIs (income, expense, balance)
 - Multi-tenant database architecture (separate database per company)
+
+
+
+## Day 9
+### Completed
+- Added search functionality for transactions using title
+- Implemented Analytics controller
+- Created Analytics routes
+- Added Total Income API
+- Added Total Expense API
+- Added Current Balance API
+- Protected Analytics APIs using authentication middleware
+- Restricted Analytics APIs to admin users
+### Tested
+- Search transactions by title
+- Case-insensitive search
+- Total Income calculation
+- Total Expense calculation
+- Current Balance calculation
+- Unauthorized access to analytics endpoints
+### Learned
+- MongoDB regular expression (`$regex`) queries
+- Aggregation of financial data using MongoDB
+- Building analytics endpoints
+- Structuring separate modules for business insights
+- Securing analytics using authentication and RBAC
+### Next Goal
+- Add date range filters for analytics
+- Add monthly/yearly transaction reports
+- Implement sorting by amount and date
+- Refactor repeated ownership validation into reusable middleware
+- Start implementing true multi-tenant architecture (separate database per company)
