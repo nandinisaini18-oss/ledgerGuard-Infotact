@@ -5,8 +5,58 @@ import { useAuth } from '../context'
 import useIsAdmin from '../hooks/useIsAdmin'
 import Button from '../components/ui/Button'
 import Alert from '../components/ui/Alert'
-import Spinner from '../components/ui/Spinner'
 import Modal from '../components/ui/Modal'
+
+function ViewTransactionSkeleton() {
+  return (
+    <div className="view-transaction" role="status" aria-label="Loading transaction">
+      <header className="vt-header">
+        <div className="vt-header__left">
+          <div className="shimmer" style={{ width: '120px', height: '18px' }} />
+          <div className="shimmer" style={{ width: '16px', height: '16px', borderRadius: 'var(--radius-sm)' }} />
+          <div className="shimmer" style={{ width: '140px', height: '18px' }} />
+        </div>
+        <div className="vt-header__actions">
+          <div className="shimmer" style={{ width: '80px', height: '32px', borderRadius: 'var(--radius-md)' }} />
+          <div className="shimmer" style={{ width: '80px', height: '32px', borderRadius: 'var(--radius-md)' }} />
+        </div>
+      </header>
+
+      <div className="vt-grid">
+        <div className="vt-grid__main">
+          <div className="vt-hero">
+            <div className="vt-hero__accent" aria-hidden="true" />
+            <div className="vt-hero__body">
+              <div className="vt-hero__badges">
+                <div className="shimmer" style={{ width: '80px', height: '30px', borderRadius: 'var(--radius-full)' }} />
+                <div className="shimmer" style={{ width: '100px', height: '30px', borderRadius: 'var(--radius-full)' }} />
+              </div>
+              <div className="vt-hero__amount-row">
+                <div className="shimmer" style={{ width: '200px', height: '44px' }} />
+              </div>
+              <div className="shimmer" style={{ width: '100%', height: '60px', borderRadius: 'var(--radius-lg)' }} />
+            </div>
+          </div>
+
+          <div className="vt-details">
+            <div className="shimmer" style={{ width: '60px', height: '14px', marginBottom: 'var(--space-4)' }} />
+            <div className="vt-details__grid">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="vt-meta-item">
+                  <div className="shimmer" style={{ width: '36px', height: '36px', borderRadius: 'var(--radius-lg)' }} />
+                  <div className="vt-meta-item__content">
+                    <div className="shimmer" style={{ width: '90px', height: '10px' }} />
+                    <div className="shimmer" style={{ width: '160px', height: '16px' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 const typeIcons = {
   income: (
@@ -112,11 +162,7 @@ export default function ViewTransaction() {
   }
 
   if (loading) {
-    return (
-      <div className="view-transaction__loading" role="status" aria-label="Loading transaction">
-        <Spinner />
-      </div>
-    )
+    return <ViewTransactionSkeleton />
   }
 
   if (error) {

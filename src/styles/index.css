@@ -1455,6 +1455,39 @@ select.form-field__input.form-field--error:focus,
   border-radius: 0 0 var(--radius-xl) var(--radius-xl);
 }
 
+/* ===== Shimmer / Skeleton ===== */
+
+.shimmer {
+  background: var(--color-gray-200);
+  border-radius: var(--radius-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer::after {
+    animation: none;
+  }
+}
+
 /* ===== Animations ===== */
 
 @media (prefers-reduced-motion: reduce) {

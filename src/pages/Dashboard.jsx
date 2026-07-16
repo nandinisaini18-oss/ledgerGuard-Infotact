@@ -8,7 +8,47 @@ import { logoutUser } from '../services/user'
 import { getTransactions } from '../services/transaction'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
-import Spinner from '../components/ui/Spinner'
+
+function DashboardRecentSkeleton() {
+  return (
+    <Card className="dash__recent-card">
+      <div className="transaction-table-container">
+        <table className="transaction-table" role="table">
+          <thead>
+            <tr className="transaction-table__header">
+              <th scope="col" className="transaction-table__header-cell">Title</th>
+              <th scope="col" className="transaction-table__header-cell">Category</th>
+              <th scope="col" className="transaction-table__header-cell">Amount</th>
+              <th scope="col" className="transaction-table__header-cell">Type</th>
+              <th scope="col" className="transaction-table__header-cell">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <tr key={i} className="transaction-table__row">
+                <td className="transaction-table__cell">
+                  <div className="shimmer" style={{ width: '140px', height: '20px' }} />
+                </td>
+                <td className="transaction-table__cell">
+                  <div className="shimmer" style={{ width: '80px', height: '24px', borderRadius: 'var(--radius-full)' }} />
+                </td>
+                <td className="transaction-table__cell">
+                  <div className="shimmer" style={{ width: '70px', height: '20px' }} />
+                </td>
+                <td className="transaction-table__cell">
+                  <div className="shimmer" style={{ width: '90px', height: '20px' }} />
+                </td>
+                <td className="transaction-table__cell">
+                  <div className="shimmer" style={{ width: '100px', height: '20px' }} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Card>
+  )
+}
 
 const typeIcons = {
   income: (
@@ -197,9 +237,7 @@ export default function Dashboard() {
         </div>
 
         {loading ? (
-          <div className="dash__loading">
-            <Spinner />
-          </div>
+          <DashboardRecentSkeleton />
         ) : recentTransactions.length === 0 ? (
           <Card className="dash__empty">
             <div className="dash__empty-icon">

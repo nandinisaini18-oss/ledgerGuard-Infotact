@@ -4,8 +4,42 @@ import TransactionForm from '../components/form/TransactionForm'
 import FormContainer from '../components/form/FormContainer'
 import Button from '../components/ui/Button'
 import Alert from '../components/ui/Alert'
-import Spinner from '../components/ui/Spinner'
 import { getTransactionById, updateTransaction } from '../services/transaction'
+
+function EditTransactionSkeleton() {
+  return (
+    <FormContainer
+      title="Edit transaction"
+      subtitle="Loading transaction\u2026"
+    >
+      <div className="form-container__fields">
+        {[
+          { width: '40px', height: '12px' },
+          { width: '100%', height: '40px' },
+          { width: '50px', height: '12px' },
+          { width: '100%', height: '40px' },
+          { width: '30px', height: '12px' },
+          { width: '100%', height: '40px' },
+          { width: '65px', height: '12px' },
+          { width: '100%', height: '40px' },
+          { width: '120px', height: '12px' },
+          { width: '100%', height: '80px' },
+        ].map((item, i) => (
+          <div key={i} className="form-field">
+            <div className="shimmer" style={{ width: item.width, height: item.height === '12px' ? item.height : 0, marginBottom: item.height === '12px' ? '6px' : 0 }} />
+            {item.height !== '12px' && (
+              <div className="shimmer" style={{ width: '100%', height: item.height }} />
+            )}
+          </div>
+        ))}
+      </div>
+      <div className="form-container__actions">
+        <div className="shimmer" style={{ width: '100%', height: '42px', borderRadius: 'var(--radius-md)' }} />
+        <div className="shimmer" style={{ width: '100%', height: '42px', borderRadius: 'var(--radius-md)' }} />
+      </div>
+    </FormContainer>
+  )
+}
 
 export default function EditTransaction() {
   const { id } = useParams()
@@ -54,16 +88,7 @@ export default function EditTransaction() {
   }
 
   if (loading) {
-    return (
-      <FormContainer
-        title="Edit transaction"
-        subtitle="Loading transaction\u2026"
-      >
-        <div className="form-container__loading">
-          <Spinner />
-        </div>
-      </FormContainer>
-    )
+    return <EditTransactionSkeleton />
   }
 
   if (error) {
