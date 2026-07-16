@@ -44,10 +44,14 @@ export async function getTransactions(req, res) {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
 
-        const { type, category } = req.query;
+        const { type, category, sort, search } = req.query;
 
         const filter = {
             companyId: req.user.companyId
+        };
+
+        let sortOption = {
+            createdAt: -1
         };
 
         if (type) {
@@ -55,7 +59,30 @@ export async function getTransactions(req, res) {
         }
 
         if (category) {
-            filter.category = category;
+            filter.category = { $regex: category, $options: "i" };
+        }
+
+        if (search) {
+        filter.title = {
+            $regex: search,
+            $options: "i"
+        };
+    }
+
+        if (sort === "amount") {
+            sortOption = { amount: 1 };
+        }
+
+        if (sort === "-amount") {
+            sortOption = { amount: -1 };
+        }
+
+        if (sort === "createdAt") {
+            sortOption = { createdAt: 1 };
+        }
+
+        if (sort === "-createdAt") {
+            sortOption = { createdAt: -1 };
         }
         // Calculate how many documents to skip
         const skip = (page - 1) * limit;
@@ -66,9 +93,9 @@ export async function getTransactions(req, res) {
         // Fetch paginated transactions
         const transactions = await transactionModel
             .find(filter)
-            .sort({ createdAt: -1 })
+            .sort(sortOption)
             .skip(skip)
-            .limit(limit);  
+            .limit(limit);
 
         // Calculate total pages
         const totalPages = Math.ceil(totalTransactions / limit);
