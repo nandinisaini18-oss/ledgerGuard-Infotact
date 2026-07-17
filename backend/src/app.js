@@ -5,6 +5,7 @@ import authRouter from "./routes/auth.routes.js"
 import companyRouter from "./routes/company.routes.js"
 import transactionRouter from "./routes/transaction.routes.js"
 import analyticsRouter from "./routes/analytics.routes.js";
+import { errorHandler } from "./middlewares/error.midlleware.js"
 import { config } from "./config/config.js"
 
 const app = express()
@@ -16,6 +17,7 @@ app.use(cors({
 
 app.use(cookieParser())
 app.use(express.json())
+app.use(errorHandler);
 
 app.use("/api/auth/user" , authRouter)
 app.use("/api/auth/company" , companyRouter)

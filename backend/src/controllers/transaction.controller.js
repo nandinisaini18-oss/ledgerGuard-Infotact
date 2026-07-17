@@ -44,7 +44,7 @@ export async function getTransactions(req, res) {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
 
-        const { type, category, sort, search } = req.query;
+        const { type, category, search, sort } = req.query;
 
         const filter = {
             companyId: req.user.companyId
@@ -93,6 +93,8 @@ export async function getTransactions(req, res) {
         // Fetch paginated transactions
         const transactions = await transactionModel
             .find(filter)
+            .populate("createdBy", "fullname email role")
+            .populate("companyId", "companyName companyEmail subscriptionPlan")
             .sort(sortOption)
             .skip(skip)
             .limit(limit);
@@ -135,7 +137,10 @@ export async function getTransaction(req, res) {
             });
         }
 
-        const transaction = await transactionModel.findById(id);
+        const transaction = await transactionModel
+            .findById(id)
+            .populate("createdBy", "fullname email role")
+            .populate("companyId", "companyName companyEmail subscriptionPlan");
 
         if (!transaction) {
             return res.status(404).json({

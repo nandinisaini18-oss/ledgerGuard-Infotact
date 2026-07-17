@@ -1,50 +1,21 @@
-import transactionModel from "../models/transaction.model.js";
+import { Router } from "express";
 
-export async function getTransactionSummary(req, res) {
-    try {
+import { authenticateUser } from "../middlewares/auth.middleware.js";
+import { getTransactionSummary } from "../controllers/analytics.controller.js";
+import { getCategoryAnalytics } from "../controllers/analytics.controller.js";
 
-        const summary = await transactionModel.aggregate([
-            {
-                $match: {
-                    companyId: req.user.companyId
-                }
-            },
-            {
-                $group: {
-                    _id: "$type",
-                    totalAmount: {
-                        $sum: "$amount"
-                    }
-                }
-            }
-        ]);
+const analyticsRouter = Router();
 
-        let totalIncome = 0;
-        let totalExpense = 0;
+analyticsRouter.get(
+    "/category",
+    authenticateUser,
+    getCategoryAnalytics
+);
 
-        summary.forEach(item => {
-            if (item._id === "income") {
-                totalIncome = item.totalAmount;
-            }
+analyticsRouter.get(
+    "/summary",
+    authenticateUser,
+    getTransactionSummary
+);
 
-            if (item._id === "expense") {
-                totalExpense = item.totalAmount;
-            }
-        });
-
-        return res.status(200).json({
-            success: true,
-            totalIncome,
-            totalExpense,
-            balance: totalIncome - totalExpense
-        });
-
-    } catch (err) {
-
-        return res.status(500).json({
-            success: false,
-            message: "Internal server error"
-        });
-
-    }
-}
+export default analyticsRouter;

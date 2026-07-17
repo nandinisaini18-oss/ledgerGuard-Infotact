@@ -45,4 +45,25 @@ const transactionSchema = new mongoose.Schema({
     timestamps: true
 });
 
+transactionSchema.index({
+    companyId: 1
+});
+
+// Company + Transaction Type
+transactionSchema.index({
+    companyId: 1,
+    type: 1
+});
+
+// Company + Category
+transactionSchema.index({
+    companyId: 1,
+    category: 1
+});
+
+// Text search on title
+transactionSchema.index({
+    title: "text"
+});
+
 export default mongoose.model("Transaction", transactionSchema);
