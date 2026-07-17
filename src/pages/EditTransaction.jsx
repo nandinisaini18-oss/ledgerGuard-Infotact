@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import TransactionForm from '../components/form/TransactionForm'
 import FormContainer from '../components/form/FormContainer'
@@ -47,13 +47,18 @@ export default function EditTransaction() {
   const [transaction, setTransaction] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [retryKey, setRetryKey] = useState(0)
+
+  const handleRetry = useCallback(() => {
+    setLoading(true)
+    setError('')
+    setRetryKey((k) => k + 1)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
 
     async function fetchTransaction() {
-      setLoading(true)
-      setError('')
       try {
         const response = await getTransactionById(id)
         if (cancelled) return
@@ -71,8 +76,7 @@ export default function EditTransaction() {
           setError('Transaction not found')
         }
       } catch (err) {
-        if (cancelled) return
-        setError(err.message || 'Failed to load transaction')
+        if (!cancelled) setError(err.message || 'Failed to load transaction')
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -80,7 +84,7 @@ export default function EditTransaction() {
 
     fetchTransaction()
     return () => { cancelled = true }
-  }, [id])
+  }, [id, retryKey])
 
   async function handleSubmit(payload) {
     await updateTransaction(id, payload)
@@ -104,6 +108,9 @@ export default function EditTransaction() {
               Back to Transactions
             </Button>
           </Link>
+          <Button variant="primary" fullWidth onClick={handleRetry}>
+            Retry
+          </Button>
         </div>
       </FormContainer>
     )

@@ -107,7 +107,11 @@ export default function TransactionList() {
   const [filterType, setFilterType] = useState('')
   const [filterCategory, setFilterCategory] = useState('')
   const [debouncedCategory, setDebouncedCategory] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [sort, setSort] = useState('-createdAt')
   const debounceTimer = useRef(null)
+  const searchDebounceTimer = useRef(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [limit, setLimit] = useState(10)
   const [totalPages, setTotalPages] = useState(1)
@@ -122,13 +126,23 @@ export default function TransactionList() {
     debounceTimer.current = setTimeout(() => setDebouncedCategory(value), 400)
   }, [])
 
+  const handleSearchChange = useCallback((e) => {
+    const value = e.target.value
+    setSearchQuery(value)
+    clearTimeout(searchDebounceTimer.current)
+    searchDebounceTimer.current = setTimeout(() => setDebouncedSearch(value), 400)
+  }, [])
+
   useEffect(() => {
-    return () => clearTimeout(debounceTimer.current)
+    return () => {
+      clearTimeout(debounceTimer.current)
+      clearTimeout(searchDebounceTimer.current)
+    }
   }, [])
 
   useEffect(() => {
     setCurrentPage(1)
-  }, [filterType, debouncedCategory, limit])
+  }, [filterType, debouncedCategory, debouncedSearch, sort, limit])
 
   useEffect(() => {
     async function fetchTransactions() {
@@ -142,6 +156,8 @@ export default function TransactionList() {
         const params = { page: currentPage, limit }
         if (filterType) params.type = filterType
         if (debouncedCategory) params.category = debouncedCategory
+        if (debouncedSearch) params.search = debouncedSearch
+        if (sort) params.sort = sort
         const response = await getTransactions(params)
         if (response.data?.success && response.data?.transactions) {
           setTransactions(response.data.transactions)
@@ -160,7 +176,7 @@ export default function TransactionList() {
     }
 
     fetchTransactions()
-  }, [currentPage, limit, filterType, debouncedCategory])
+  }, [currentPage, limit, filterType, debouncedCategory, debouncedSearch, sort])
 
   useEffect(() => {
     if (!flash) return
@@ -241,6 +257,23 @@ export default function TransactionList() {
       )}
 
       <div className="transaction-list__filters">
+        <div className="transaction-list__filter transaction-list__filter--search">
+          <label htmlFor="filter-search" className="transaction-list__filter-label">Search</label>
+          <div className="transaction-list__search-wrapper">
+            <svg className="transaction-list__search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              id="filter-search"
+              type="text"
+              className="form-field__input transaction-list__filter-input transaction-list__filter-search"
+              placeholder="Search by title"
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+          </div>
+        </div>
         <div className="transaction-list__filter">
           <label htmlFor="filter-type" className="transaction-list__filter-label">Type</label>
           <select
@@ -264,6 +297,20 @@ export default function TransactionList() {
             value={filterCategory}
             onChange={handleCategoryChange}
           />
+        </div>
+        <div className="transaction-list__filter">
+          <label htmlFor="filter-sort" className="transaction-list__filter-label">Sort</label>
+          <select
+            id="filter-sort"
+            className="form-field__input transaction-list__filter-select"
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+          >
+            <option value="-createdAt">Date (Newest)</option>
+            <option value="createdAt">Date (Oldest)</option>
+            <option value="-amount">Amount (Highest)</option>
+            <option value="amount">Amount (Lowest)</option>
+          </select>
         </div>
         <div className="transaction-list__filter">
           <label htmlFor="filter-limit" className="transaction-list__filter-label">Per page</label>

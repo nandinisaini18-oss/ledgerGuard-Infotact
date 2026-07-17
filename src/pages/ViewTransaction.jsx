@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { getTransactionById, deleteTransaction } from '../services/transaction'
 import { useAuth } from '../context'
@@ -106,13 +106,18 @@ export default function ViewTransaction() {
   const [error, setError] = useState('')
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [retryKey, setRetryKey] = useState(0)
+
+  const handleRetry = useCallback(() => {
+    setLoading(true)
+    setError('')
+    setRetryKey((k) => k + 1)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
 
     async function fetchTransaction() {
-      setLoading(true)
-      setError('')
       try {
         const response = await getTransactionById(id)
         if (cancelled) return
@@ -123,8 +128,7 @@ export default function ViewTransaction() {
           setError('Transaction not found')
         }
       } catch (err) {
-        if (cancelled) return
-        setError(err.message || 'Failed to load transaction')
+        if (!cancelled) setError(err.message || 'Failed to load transaction')
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -132,7 +136,7 @@ export default function ViewTransaction() {
 
     fetchTransaction()
     return () => { cancelled = true }
-  }, [id])
+  }, [id, retryKey])
 
   function handleDeleteClick() {
     setDeleteDialogOpen(true)
@@ -175,7 +179,7 @@ export default function ViewTransaction() {
               <Link to="/transactions">
                 <Button variant="secondary">Back to Transactions</Button>
               </Link>
-              <button onClick={() => window.location.reload()} className="btn btn--ghost">
+              <button onClick={handleRetry} className="btn btn--ghost">
                 Retry
               </button>
             </div>

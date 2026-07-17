@@ -2,7 +2,7 @@ import Card from './Card'
 
 function PageTitleSkeleton({ isAdmin }) {
   return (
-    <div className="transaction-list__header">
+    <div className="transaction-list__header" role="status" aria-label="Loading page">
       <div>
         <div className="shimmer shimmer-title" style={{ width: "160px", height: "28px", marginBottom: "8px" }} />
         <div className="shimmer shimmer-subtitle" style={{ width: "240px", height: "16px" }} />
@@ -16,7 +16,7 @@ function PageTitleSkeleton({ isAdmin }) {
 
 function FilterSectionSkeleton() {
   return (
-    <div className="transaction-list__filters">
+    <div className="transaction-list__filters" role="status" aria-label="Loading filters">
       <div className="transaction-list__filter">
         <div className="shimmer shimmer-label" style={{ width: "60px", height: "14px", marginBottom: "8px" }} />
         <div className="shimmer shimmer-select" style={{ width: "160px", height: "40px" }} />
@@ -35,7 +35,7 @@ function FilterSectionSkeleton() {
 
 function TransactionTableSkeleton({ isAdmin }) {
   return (
-    <Card className="transaction-list__table-wrapper">
+    <Card className="transaction-list__table-wrapper" role="status" aria-label="Loading transactions">
       <div className="transaction-table-container">
         <div className="transaction-table" role="table">
           <thead>
@@ -84,7 +84,7 @@ function TransactionTableSkeleton({ isAdmin }) {
 
 function PaginationSkeleton() {
   return (
-    <div className="pagination">
+    <div className="pagination" role="status" aria-label="Loading pagination">
       <div className="pagination__controls">
         <div className="shimmer shimmer-button" style={{ width: "80px", height: "36px" }} />
         <div className="pagination__pages">

@@ -12,6 +12,7 @@ import TransactionList from '../pages/TransactionList'
 import CreateTransaction from '../pages/CreateTransaction'
 import EditTransaction from '../pages/EditTransaction'
 import ViewTransaction from '../pages/ViewTransaction'
+import Analytics from '../pages/Analytics'
 import ProtectedRoute from '../components/ProtectedRoute'
 import AdminRoute from '../components/AdminRoute'
 import { AuthProvider, useAuth } from '../context'
@@ -57,6 +58,7 @@ function AppRoutesInner() {
               <Route path="/transactions/new" element={<AdminRoute><CreateTransaction /></AdminRoute>} />
               <Route path="/transactions/:id" element={<ViewTransaction />} />
               <Route path="/transactions/:id/edit" element={<AdminRoute><EditTransaction /></AdminRoute>} />
+              <Route path="/analytics" element={<Analytics />} />
             </Route>
           </>
         ) : (

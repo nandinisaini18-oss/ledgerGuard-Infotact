@@ -1,17 +1,36 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import useIsAdmin from '../hooks/useIsAdmin'
 import { logoutUser } from '../services/user'
 import { getTransactions } from '../services/transaction'
+import { getTransactionSummary } from '../services/analytics'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
+import EmptyState from '../components/ui/EmptyState'
+import Alert from '../components/ui/Alert'
+
+function DashboardStatsSkeleton() {
+  return (
+    <div className="dash__stats-grid" role="status" aria-label="Loading statistics">
+      {[0, 1, 2].map((i) => (
+        <Card key={i} className="dash__stat-card">
+          <div className="shimmer" style={{ width: '40px', height: '40px', borderRadius: 'var(--radius-lg)' }} />
+          <div className="dash__stat-body">
+            <div className="shimmer" style={{ width: '80px', height: '14px', marginBottom: '6px' }} />
+            <div className="shimmer" style={{ width: '100px', height: '24px' }} />
+          </div>
+        </Card>
+      ))}
+    </div>
+  )
+}
 
 function DashboardRecentSkeleton() {
   return (
-    <Card className="dash__recent-card">
+    <Card className="dash__recent-card" role="status" aria-label="Loading recent transactions">
       <div className="transaction-table-container">
         <table className="transaction-table" role="table">
           <thead>
@@ -71,40 +90,49 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const [recentTransactions, setRecentTransactions] = useState([])
   const [totalCount, setTotalCount] = useState(0)
-  const [incomeCount, setIncomeCount] = useState(0)
-  const [expenseCount, setExpenseCount] = useState(0)
+  const [totalIncome, setTotalIncome] = useState(0)
+  const [totalExpense, setTotalExpense] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [retryKey, setRetryKey] = useState(0)
+
+  const handleRetry = useCallback(() => {
+    setLoading(true)
+    setError('')
+    setRetryKey((k) => k + 1)
+  }, [])
 
   useEffect(() => {
+    let cancelled = false
+
     async function fetchDashboardData() {
       try {
-        const [recentRes, incomeRes, expenseRes] = await Promise.all([
+        const [recentRes, summaryRes] = await Promise.all([
           getTransactions({ page: 1, limit: 5 }),
-          getTransactions({ page: 1, limit: 1, type: 'income' }),
-          getTransactions({ page: 1, limit: 1, type: 'expense' }),
+          getTransactionSummary(),
         ])
+
+        if (cancelled) return
 
         if (recentRes.data?.success) {
           setRecentTransactions(recentRes.data.transactions || [])
           setTotalCount(recentRes.data.totalTransactions || 0)
         }
 
-        if (incomeRes.data?.success) {
-          setIncomeCount(incomeRes.data.totalTransactions || 0)
+        if (summaryRes.data?.success) {
+          setTotalIncome(summaryRes.data.totalIncome || 0)
+          setTotalExpense(summaryRes.data.totalExpense || 0)
         }
-
-        if (expenseRes.data?.success) {
-          setExpenseCount(expenseRes.data.totalTransactions || 0)
-        }
-      } catch {
-        // Silent fail — dashboard still renders user data
+      } catch (err) {
+        if (!cancelled) setError(err.message || 'Failed to load dashboard data')
       } finally {
-        setLoading(false)
+        if (!cancelled) setLoading(false)
       }
     }
 
     fetchDashboardData()
-  }, [])
+    return () => { cancelled = true }
+  }, [retryKey])
 
   async function handleLogout() {
     try {
@@ -180,46 +208,57 @@ export default function Dashboard() {
       {/* Statistics */}
       <section className="dash__section">
         <h2 className="dash__section-title">Overview</h2>
-        <div className="dash__stats-grid">
-          <Card className="dash__stat-card">
-            <div className="dash__stat-icon dash__stat-icon--total">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <line x1="12" y1="1" x2="12" y2="23" />
-                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-              </svg>
-            </div>
-            <div className="dash__stat-body">
-              <p className="dash__stat-label">Total Transactions</p>
-              <p className="dash__stat-value">{totalCount}</p>
-            </div>
-          </Card>
+        {loading ? (
+          <DashboardStatsSkeleton />
+        ) : error ? (
+          <div className="dash__error" role="alert">
+            <Alert variant="error" message={error} />
+            <Button variant="secondary" size="sm" onClick={handleRetry}>
+              Retry
+            </Button>
+          </div>
+        ) : (
+          <div className="dash__stats-grid">
+            <Card className="dash__stat-card">
+              <div className="dash__stat-icon dash__stat-icon--total">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <line x1="12" y1="1" x2="12" y2="23" />
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+              </div>
+              <div className="dash__stat-body">
+                <p className="dash__stat-label">Total Transactions</p>
+                <p className="dash__stat-value">{totalCount}</p>
+              </div>
+            </Card>
 
-          <Card className="dash__stat-card">
-            <div className="dash__stat-icon dash__stat-icon--income">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <line x1="12" y1="19" x2="12" y2="5" />
-                <polyline points="19 12 12 5 5 12" />
-              </svg>
-            </div>
-            <div className="dash__stat-body">
-              <p className="dash__stat-label">Income</p>
-              <p className="dash__stat-value dash__stat-value--income">{incomeCount}</p>
-            </div>
-          </Card>
+            <Card className="dash__stat-card">
+              <div className="dash__stat-icon dash__stat-icon--income">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <line x1="12" y1="19" x2="12" y2="5" />
+                  <polyline points="19 12 12 5 5 12" />
+                </svg>
+              </div>
+              <div className="dash__stat-body">
+                <p className="dash__stat-label">Income</p>
+                <p className="dash__stat-value dash__stat-value--income">${totalIncome.toFixed(2)}</p>
+              </div>
+            </Card>
 
-          <Card className="dash__stat-card">
-            <div className="dash__stat-icon dash__stat-icon--expense">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <polyline points="19 12 12 19 5 12" />
-              </svg>
-            </div>
-            <div className="dash__stat-body">
-              <p className="dash__stat-label">Expenses</p>
-              <p className="dash__stat-value dash__stat-value--expense">{expenseCount}</p>
-            </div>
-          </Card>
-        </div>
+            <Card className="dash__stat-card">
+              <div className="dash__stat-icon dash__stat-icon--expense">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <polyline points="19 12 12 19 5 12" />
+                </svg>
+              </div>
+              <div className="dash__stat-body">
+                <p className="dash__stat-label">Expenses</p>
+                <p className="dash__stat-value dash__stat-value--expense">${totalExpense.toFixed(2)}</p>
+              </div>
+            </Card>
+          </div>
+        )}
       </section>
 
       {/* Recent Transactions */}
@@ -240,23 +279,27 @@ export default function Dashboard() {
           <DashboardRecentSkeleton />
         ) : recentTransactions.length === 0 ? (
           <Card className="dash__empty">
-            <div className="dash__empty-icon">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <line x1="12" y1="1" x2="12" y2="23" />
-                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-              </svg>
-            </div>
-            <h3 className="dash__empty-title">No transactions yet</h3>
-            <p className="dash__empty-desc">
-              {isAdmin
-                ? 'Create your first transaction to get started.'
-                : 'Transactions will appear here once an admin creates them.'}
-            </p>
-            {isAdmin && (
-              <Link to="/transactions/new">
-                <Button variant="primary" size="sm">Create Transaction</Button>
-              </Link>
-            )}
+            <EmptyState
+              icon={
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <line x1="12" y1="1" x2="12" y2="23" />
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+              }
+              title="No transactions yet"
+              description={
+                isAdmin
+                  ? 'Create your first transaction to get started.'
+                  : 'Transactions will appear here once an admin creates them.'
+              }
+              action={
+                isAdmin && (
+                  <Link to="/transactions/new">
+                    <Button variant="primary" size="sm">Create Transaction</Button>
+                  </Link>
+                )
+              }
+            />
           </Card>
         ) : (
           <Card className="dash__recent-card">
