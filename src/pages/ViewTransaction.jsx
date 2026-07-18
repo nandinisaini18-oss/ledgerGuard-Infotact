@@ -273,7 +273,7 @@ export default function ViewTransaction() {
               {/* Amount */}
               <div className="vt-hero__amount-row">
                 <span className={`vt-hero__amount vt-hero__amount--${typeClass}`}>
-                  {isIncome ? '+' : '−'}${(Number(transaction.amount) || 0).toFixed(2)}
+                  {isIncome ? '+' : '−'}₹{(Number(transaction.amount) || 0).toFixed(2)}
                 </span>
               </div>
 
@@ -406,9 +406,9 @@ export default function ViewTransaction() {
           <div className="delete-dialog__transaction-info">
             <span className="delete-dialog__label">Transaction</span>
             <span className="delete-dialog__title">{transaction.title}</span>
-            <span className={`delete-dialog__amount ${typeClass}`}>
-              {isIncome ? '+' : '−'}${(Number(transaction.amount) || 0).toFixed(2)}
-            </span>
+          <span className={`delete-dialog__amount ${typeClass}`}>
+            {isIncome ? '+' : '−'}₹{(Number(transaction.amount) || 0).toFixed(2)}
+          </span>
           </div>
           <div className="modal__actions">
             <Button variant="secondary" onClick={handleCancelDelete} disabled={deleting}>

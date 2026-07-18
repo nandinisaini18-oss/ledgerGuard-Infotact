@@ -47,7 +47,7 @@ function TransactionRow({ transaction, onDelete, isAdmin }) {
       </td>
       <td className="transaction-table__cell">
         <span className={`transaction-table__amount ${isIncome ? 'income' : 'expense'}`}>
-          {isIncome ? '+' : '-'}${transaction.amount.toFixed(2)}
+          {isIncome ? '+' : '-'}₹{transaction.amount.toFixed(2)}
         </span>
       </td>
       <td className="transaction-table__cell">

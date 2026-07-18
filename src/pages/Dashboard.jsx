@@ -241,7 +241,7 @@ export default function Dashboard() {
               </div>
               <div className="dash__stat-body">
                 <p className="dash__stat-label">Income</p>
-                <p className="dash__stat-value dash__stat-value--income">${totalIncome.toFixed(2)}</p>
+                <p className="dash__stat-value dash__stat-value--income">₹{totalIncome.toFixed(2)}</p>
               </div>
             </Card>
 
@@ -254,7 +254,7 @@ export default function Dashboard() {
               </div>
               <div className="dash__stat-body">
                 <p className="dash__stat-label">Expenses</p>
-                <p className="dash__stat-value dash__stat-value--expense">${totalExpense.toFixed(2)}</p>
+                <p className="dash__stat-value dash__stat-value--expense">₹{totalExpense.toFixed(2)}</p>
               </div>
             </Card>
           </div>

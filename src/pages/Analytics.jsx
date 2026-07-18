@@ -164,7 +164,7 @@ export default function Analytics() {
               <div className="analytics__summary-body">
                 <p className="analytics__summary-label">Total Expense</p>
                 <p className="analytics__summary-value analytics__summary-value--expense">
-                  ${summary.totalExpense.toFixed(2)}
+                  ₹{summary.totalExpense.toFixed(2)}
                 </p>
               </div>
             </Card>
@@ -178,10 +178,10 @@ export default function Analytics() {
               </div>
               <div className="analytics__summary-body">
                 <p className="analytics__summary-label">Balance</p>
-                <p className={`analytics__summary-value ${summary.balance >= 0 ? 'analytics__summary-value--income' : 'analytics__summary-value--expense'}`}>
-                  ${Math.abs(summary.balance).toFixed(2)}
-                  {summary.balance < 0 && ' (deficit)'}
-                </p>
+              <p className={`analytics__summary-value ${summary.balance >= 0 ? 'analytics__summary-value--income' : 'analytics__summary-value--expense'}`}>
+                ₹{Math.abs(summary.balance).toFixed(2)}
+                {summary.balance < 0 && ' (deficit)'}
+              </p>
               </div>
             </Card>
           </div>
