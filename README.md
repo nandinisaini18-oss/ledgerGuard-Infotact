@@ -298,3 +298,31 @@ LedgerGuard is a multi-tenant ledger management system where companies can regis
 - Recent transactions API
 - Multi-database (database-per-company) architecture
 - Dynamic database connection manager
+
+
+
+## Day 11
+### Completed
+- Added `databaseName` field to Company schema
+- Generated a unique database name during company registration
+- Created a reusable tenant connection manager using `mongoose.createConnection()`
+- Implemented connection caching for tenant databases
+- Created a dynamic Transaction model for tenant databases
+- Migrated Transaction creation to use company-specific databases
+- Started the implementation of database-per-company multi-tenancy architecture
+### Tested
+- Company registration with generated database name
+- Dynamic tenant connection creation
+- Transaction creation using tenant-specific model
+- Verified tenant database selection logic
+### Learned
+- Multi-tenant architecture using separate databases
+- Dynamic Mongoose connections with `createConnection()`
+- Model registration per database connection
+- Connection caching for better performance
+- Designing scalable SaaS backend architecture
+### Next Goal
+- Migrate remaining Transaction CRUD operations to tenant databases
+- Move User model to tenant databases
+- Refactor authentication middleware for tenant-aware user lookup
+- Complete true database-per-company architecture
