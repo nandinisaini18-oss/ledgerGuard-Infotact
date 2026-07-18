@@ -11,6 +11,11 @@ const companySchema = new mongoose.Schema({
         required : true,
         unique : true
     },
+    databaseName: {
+        type: String,
+        required: true,
+        unique: true
+    },
     subscriptionPlan : {
         type : String,
         enum: ["basic", "pro", "enterprise"],
@@ -20,7 +25,7 @@ const companySchema = new mongoose.Schema({
         type : String,
         enum: ["active", "inactive"],
         default: "active"
-    }
+    },
 }, 
     {
         timestamps : true

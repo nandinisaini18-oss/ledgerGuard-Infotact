@@ -2,6 +2,7 @@ import companyModel from "../models/company.model.js"
 
 export async function registerCompany(req , res){
     const {companyName , companyEmail , subscriptionPlan } = req.body
+    const databaseName = `company_${companyName.toLowerCase().replace(/\s+/g, "_")}`;
 
     try{
          const isCompanyExists = await companyModel.findOne({
@@ -21,7 +22,8 @@ export async function registerCompany(req , res){
         const company = await companyModel.create({
             companyName , 
             companyEmail , 
-            subscriptionPlan 
+            subscriptionPlan ,
+            databaseName
         })
 
         return res.status(201).json({
@@ -31,6 +33,7 @@ export async function registerCompany(req , res){
                 id: company._id,
                 companyName: company.companyName,
                 companyEmail: company.companyEmail,
+                databaseName: company.databaseName,
                 subscriptionPlan: company.subscriptionPlan,
                 status: company.status
             }

@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
 import transactionModel from "../models/transaction.model.js";
+import companyModel from "../models/company.model.js";
+import { getTenantConnection } from "../database/tenantConnection.js";
+import { getTransactionModel } from "../models/tenantTransaction.model.js";
 
 
 /**
@@ -9,7 +12,20 @@ export async function createTransaction(req, res) {
     const { title, amount, type, category, description } = req.body;
 
     try {
-        const transaction = await transactionModel.create({
+        const company = await companyModel.findById(req.user.companyId);
+
+        if (!company) {
+            return res.status(404).json({
+                success: false,
+                message: "Company not found"
+            });
+        }
+
+        const connection = getTenantConnection(company.databaseName);
+
+        const Transaction = getTransactionModel(connection);
+
+        const transaction = await Transaction.create({
             title,
             amount,
             type,
@@ -32,7 +48,6 @@ export async function createTransaction(req, res) {
         });
     }
 }
-
 
 /**
  * Get All Transactions
