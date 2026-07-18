@@ -163,8 +163,10 @@ export async function getTransaction(req, res) {
                 message: "Transaction not found"
             });
         }
+        
+        const transactionCompanyId = transaction.companyId._id ? transaction.companyId._id : transaction.companyId;
 
-        if (transaction.companyId.toString() !== req.user.companyId.toString()) {
+        if (transactionCompanyId.toString() !== req.user.companyId.toString()) {
             return res.status(403).json({
                 success: false,
                 message: "Access denied"
@@ -210,7 +212,9 @@ export async function updateTransaction(req, res) {
             });
         }
 
-        if (transaction.companyId.toString() !== req.user.companyId.toString()) {
+        const transactionCompanyId = transaction.companyId._id ? transaction.companyId._id : transaction.companyId;
+
+        if (transactionCompanyId.toString() !== req.user.companyId.toString()) {
             return res.status(403).json({
                 success: false,
                 message: "Access denied"
@@ -267,8 +271,9 @@ export async function deleteTransaction(req, res) {
                 message: "Transaction not found"
             });
         }
+        const transactionCompanyId = transaction.companyId._id ? transaction.companyId._id : transaction.companyId;
 
-        if (transaction.companyId.toString() !== req.user.companyId.toString()) {
+        if (transactionCompanyId.toString() !== req.user.companyId.toString()) {
             return res.status(403).json({
                 success: false,
                 message: "Access denied"
