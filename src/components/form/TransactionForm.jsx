@@ -13,7 +13,13 @@ const typeOptions = [
 ]
 
 function validate(form) {
-  const titleError = validateRequired(form.title, 'Title')
+  let titleError = validateRequired(form.title, 'Title')
+  if (!titleError && form.title.trim().length < 3) {
+    titleError = 'Title must be between 3 and 100 characters'
+  }
+  if (!titleError && form.title.trim().length > 100) {
+    titleError = 'Title must be between 3 and 100 characters'
+  }
 
   let amountError = validateRequired(form.amount, 'Amount')
   if (!amountError && form.amount) {
@@ -24,7 +30,14 @@ function validate(form) {
   }
 
   const typeError = validateRequired(form.type, 'Type')
-  const categoryError = validateRequired(form.category, 'Category')
+
+  let categoryError = validateRequired(form.category, 'Category')
+  if (!categoryError && form.category.trim().length < 2) {
+    categoryError = 'Category must be between 2 and 50 characters'
+  }
+  if (!categoryError && form.category.trim().length > 50) {
+    categoryError = 'Category must be between 2 and 50 characters'
+  }
 
   let descriptionError = ''
   if (form.description && form.description.length > 500) {
@@ -84,7 +97,11 @@ export default function TransactionForm({
       }
       await onSubmit(payload)
     } catch (err) {
-      setSubmitError(err.message)
+      if (err.fieldErrors && Object.keys(err.fieldErrors).length > 0) {
+        setErrors((prev) => ({ ...prev, ...err.fieldErrors }))
+      } else {
+        setSubmitError(err.message)
+      }
     } finally {
       setLoading(false)
     }

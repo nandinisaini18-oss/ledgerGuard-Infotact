@@ -149,7 +149,7 @@ export default function Analytics() {
               <div className="analytics__summary-body">
                 <p className="analytics__summary-label">Total Income</p>
                 <p className="analytics__summary-value analytics__summary-value--income">
-                  ${summary.totalIncome.toFixed(2)}
+                  ₹{summary.totalIncome.toFixed(2)}
                 </p>
               </div>
             </Card>
@@ -222,7 +222,7 @@ export default function Analytics() {
                       </td>
                       <td className="transaction-table__cell">
                         <span className="analytics__category-amount">
-                          ${cat.totalAmount.toFixed(2)}
+                          ₹{cat.totalAmount.toFixed(2)}
                         </span>
                       </td>
                     </tr>

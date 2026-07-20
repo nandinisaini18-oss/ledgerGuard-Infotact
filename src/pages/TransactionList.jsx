@@ -451,7 +451,7 @@ export default function TransactionList() {
             <span className="delete-dialog__label">Transaction:</span>
             <span className="delete-dialog__title">{transactionToDelete?.title}</span>
             <span className={`delete-dialog__amount ${transactionToDelete?.type === 'income' ? 'income' : 'expense'}`}>
-              {transactionToDelete?.type === 'income' ? '+' : '-'}${transactionToDelete?.amount.toFixed(2)}
+              {transactionToDelete?.type === 'income' ? '+' : '-'}₹{(Number(transactionToDelete?.amount) || 0).toFixed(2)}
             </span>
           </div>
           <div className="modal__actions">

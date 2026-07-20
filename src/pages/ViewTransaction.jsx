@@ -179,7 +179,7 @@ export default function ViewTransaction() {
               <Link to="/transactions">
                 <Button variant="secondary">Back to Transactions</Button>
               </Link>
-              <button onClick={handleRetry} className="btn btn--ghost">
+              <button type="button" onClick={handleRetry} className="btn btn--ghost">
                 Retry
               </button>
             </div>
@@ -354,13 +354,13 @@ export default function ViewTransaction() {
                   </div>
                   <div className="vt-meta-item__content">
                     <span className="vt-meta-item__label">Created By</span>
-                    {user && String(transaction.createdBy) === String(user.id) ? (
+                    {user && transaction.createdBy._id === user.id ? (
                       <>
-                        <span className="vt-meta-item__value">{user.fullname}</span>
-                        <span className="vt-meta-item__sub">ID: {formatShortId(transaction.createdBy)}</span>
+                        <span className="vt-meta-item__value">{transaction.createdBy.fullname || user.fullname}</span>
+                        <span className="vt-meta-item__sub">ID: {formatShortId(transaction.createdBy._id)}</span>
                       </>
                     ) : (
-                      <span className="vt-meta-item__value vt-meta-item__value--mono">{formatShortId(transaction.createdBy)}</span>
+                      <span className="vt-meta-item__value">{transaction.createdBy.fullname || formatShortId(transaction.createdBy._id)}</span>
                     )}
                   </div>
                 </div>
@@ -382,7 +382,7 @@ export default function ViewTransaction() {
                   </div>
                   <div className="vt-meta-item__content">
                     <span className="vt-meta-item__label">Company</span>
-                    <span className="vt-meta-item__value vt-meta-item__value--mono">{formatShortId(transaction.companyId)}</span>
+                    <span className="vt-meta-item__value">{transaction.companyId.companyName || formatShortId(transaction.companyId._id)}</span>
                   </div>
                 </div>
               )}

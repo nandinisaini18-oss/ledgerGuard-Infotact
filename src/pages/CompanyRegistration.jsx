@@ -59,7 +59,11 @@ function CompanyRegistration() {
       setSuccess(true)
       setForm(initialForm)
     } catch (err) {
-      setSubmitError(err.message)
+      if (err.fieldErrors && Object.keys(err.fieldErrors).length > 0) {
+        setErrors((prev) => ({ ...prev, ...err.fieldErrors }))
+      } else {
+        setSubmitError(err.message)
+      }
     } finally {
       setLoading(false)
     }

@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import FormContainer from '../components/form/FormContainer'
 import Input from '../components/ui/Input'
 import Button from '../components/ui/Button'
 import Alert from '../components/ui/Alert'
 import { loginUser } from '../services/user'
-import { validateRequired, validateEmail, validateForm } from '../utils/validators'
+import { validateRequired, validateEmail, validatePassword, validateForm } from '../utils/validators'
 import { useAuth } from '../context'
 
 const initialForm = {
@@ -33,7 +33,7 @@ function Login() {
   function validate() {
     return validateForm({
       email: () => validateEmail(form.email),
-      password: () => validateRequired(form.password, 'Password'),
+      password: () => validatePassword(form.password),
     })
   }
 
@@ -50,10 +50,16 @@ function Login() {
       const response = await loginUser(form)
       if (response.data?.success && response.data?.user) {
         setUser(response.data.user)
+        navigate('/dashboard')
+      } else {
+        setSubmitError('Login failed. Please try again.')
       }
-      navigate('/dashboard')
     } catch (err) {
-      setSubmitError(err.message)
+      if (err.fieldErrors && Object.keys(err.fieldErrors).length > 0) {
+        setErrors((prev) => ({ ...prev, ...err.fieldErrors }))
+      } else {
+        setSubmitError(err.message)
+      }
     } finally {
       setLoading(false)
     }
@@ -66,9 +72,9 @@ function Login() {
       footer={
         <p className="form-container__footer-text">
           Need to register a company or user first?{' '}
-          <a href="/register-company" className="form-container__footer-link">Register Company</a>
+          <Link to="/register-company" className="form-container__footer-link">Register Company</Link>
           {' '}or{' '}
-          <a href="/register-user" className="form-container__footer-link">Register User</a>
+          <Link to="/register-user" className="form-container__footer-link">Register User</Link>
         </p>
       }
     >

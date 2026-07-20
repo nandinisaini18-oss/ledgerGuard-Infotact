@@ -7,9 +7,11 @@ import Alert from '../components/ui/Alert'
 import { registerUser } from '../services/user'
 import {
   validateRequired,
+  validateFullName,
   validateEmail,
   validatePassword,
   validatePasswordMatch,
+  validateMongoId,
   validateForm,
 } from '../utils/validators'
 
@@ -46,12 +48,12 @@ function UserRegistration() {
 
   function validate() {
     return validateForm({
-      fullname: () => validateRequired(form.fullname, 'Full name'),
+      fullname: () => validateFullName(form.fullname),
       email: () => validateEmail(form.email),
       password: () => validatePassword(form.password),
       confirmPassword: () => validatePasswordMatch(form.password, form.confirmPassword),
       role: () => validateRequired(form.role, 'Role'),
-      companyId: () => validateRequired(form.companyId, 'Company ID'),
+      companyId: () => validateMongoId(form.companyId, 'Company ID'),
     })
   }
 
@@ -77,7 +79,11 @@ function UserRegistration() {
       setSuccess(true)
       setForm(initialForm)
     } catch (err) {
-      setSubmitError(err.message)
+      if (err.fieldErrors && Object.keys(err.fieldErrors).length > 0) {
+        setErrors((prev) => ({ ...prev, ...err.fieldErrors }))
+      } else {
+        setSubmitError(err.message)
+      }
     } finally {
       setLoading(false)
     }
@@ -176,7 +182,7 @@ function UserRegistration() {
             id="password"
             name="password"
             type="password"
-            placeholder="Min. 8 characters"
+            placeholder="Min. 6 characters"
             value={form.password}
             onChange={handleChange}
             error={errors.password}

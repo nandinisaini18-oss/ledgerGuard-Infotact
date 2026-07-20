@@ -14,6 +14,10 @@ api.interceptors.response.use(
   (error) => {
     if (error.response) {
       const { status, data } = error.response
+      const fieldErrors = data?.errors?.reduce((acc, { path, msg }) => {
+        if (path && msg) acc[path] = msg
+        return acc
+      }, {}) || null
       const message =
         data?.message ||
         data?.error ||
@@ -23,7 +27,9 @@ api.interceptors.response.use(
         (status === 404 && 'The requested resource was not found.') ||
         (status >= 500 && 'A server error occurred. Please try again later.') ||
         'An unexpected error occurred.'
-      return Promise.reject(new Error(message))
+      const err = new Error(message)
+      err.fieldErrors = fieldErrors
+      return Promise.reject(err)
     }
     if (error.request) {
       return Promise.reject(

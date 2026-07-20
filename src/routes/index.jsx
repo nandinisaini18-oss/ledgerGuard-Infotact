@@ -46,6 +46,7 @@ function AppRoutesInner() {
             <Route path="/register-company" element={<Navigate to="/" replace />} />
             <Route path="/register-user" element={<Navigate to="/" replace />} />
             <Route path="/login" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
             <Route
               element={
                 <ProtectedRoute>

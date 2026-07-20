@@ -153,7 +153,7 @@ export default function Dashboard() {
           <h1 className="dash__greeting">{user?.fullname || 'User'}</h1>
           <p className="dash__meta">
             <span className="dash__meta-badge">
-              {user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1)}
+              {user?.role ? (user.role.charAt(0).toUpperCase() + user.role.slice(1)) : ''}
             </span>
             <span className="dash__meta-separator" />
             <span className="dash__meta-id">Company {user?.companyId}</span>
@@ -337,7 +337,7 @@ export default function Dashboard() {
                         </td>
                         <td className="transaction-table__cell">
                           <span className={`transaction-table__amount ${isIncome ? 'income' : 'expense'}`}>
-                            {isIncome ? '+' : '-'}${t.amount.toFixed(2)}
+                            {isIncome ? '+' : '-'}₹{t.amount.toFixed(2)}
                           </span>
                         </td>
                         <td className="transaction-table__cell">
