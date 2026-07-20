@@ -326,3 +326,39 @@ LedgerGuard is a multi-tenant ledger management system where companies can regis
 - Move User model to tenant databases
 - Refactor authentication middleware for tenant-aware user lookup
 - Complete true database-per-company architecture
+
+
+
+## Day 12
+### Completed
+- Refactored authentication flow to support tenant-specific databases
+- Updated login process to authenticate users from their company's database
+- Made authentication middleware tenant-aware
+- Migrated all Transaction CRUD operations to use tenant-specific database connections
+- Updated Analytics Controller to use tenant-specific Transaction models
+- Removed cross-database `populate("companyId")` to avoid invalid population across separate MongoDB connections
+- Implemented dynamic User and Transaction model loading per tenant connection
+- Moved global error-handling middleware to the end of the Express middleware stack
+- Improved overall multi-tenant architecture consistency
+### Tested
+- User registration in tenant database
+- User login from tenant database
+- Authentication using tenant-specific User model
+- Transaction CRUD using isolated company databases
+- Analytics endpoints using tenant-specific Transaction collections
+- Authorization after tenant authentication
+- Error handling after middleware refactoring
+### Learned
+- Building tenant-aware authentication systems
+- Dynamic Mongoose connections using `createConnection()`
+- Dynamic model registration with connection-specific models
+- Limitations of `populate()` across different MongoDB connections
+- Structuring controllers for complete database isolation
+- Proper Express middleware ordering
+- Designing scalable SaaS multi-tenant architectures
+### Next Goal
+- Implement Redis distributed locks for idempotent transaction processing
+- Add unique request/event IDs to prevent duplicate requests
+- Introduce MongoDB ACID transactions using sessions
+- Implement automatic rollback for failed financial operations
+- Begin Week 2 Idempotent Ledger implementation
