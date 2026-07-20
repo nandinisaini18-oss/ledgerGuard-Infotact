@@ -103,11 +103,10 @@ export async function getTransactions(req, res) {
         const skip = (page - 1) * limit;
 
         // Count total transactions for this company
-        const totalTransactions = await transactionModel.countDocuments(filter);
+        const totalTransactions = await Transaction.countDocuments(filter);
 
         // Fetch paginated transactions
-        const transactions = await transactionModel
-            .find(filter)
+        const transactions = await Transaction.find(filter)
             .populate("createdBy", "fullname email role")
             .populate("companyId", "companyName companyEmail subscriptionPlan")
             .sort(sortOption)
@@ -152,8 +151,7 @@ export async function getTransaction(req, res) {
             });
         }
 
-        const transaction = await transactionModel
-            .findById(id)
+       const transaction = await Transaction.findById(id)
             .populate("createdBy", "fullname email role")
             .populate("companyId", "companyName companyEmail subscriptionPlan");
 
@@ -203,7 +201,7 @@ export async function updateTransaction(req, res) {
             });
         }
 
-        const transaction = await transactionModel.findById(id);
+        const transaction = await Transaction.findById(id);
 
         if (!transaction) {
             return res.status(404).json({
@@ -263,7 +261,7 @@ export async function deleteTransaction(req, res) {
             });
         }
 
-        const transaction = await transactionModel.findById(id);
+        const transaction = await Transaction.findById(id);
 
         if (!transaction) {
             return res.status(404).json({

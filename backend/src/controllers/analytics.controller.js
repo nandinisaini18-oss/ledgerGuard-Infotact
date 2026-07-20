@@ -1,9 +1,7 @@
-import transactionModel from "../models/transaction.model.js";
-
 export async function getCategoryAnalytics(req, res) {
     try {
 
-        const categories = await transactionModel.aggregate([
+        const categories = await Transaction.aggregate([
             {
                 $match: {
                     companyId: req.user.companyId
@@ -42,7 +40,7 @@ export async function getCategoryAnalytics(req, res) {
 export async function getTransactionSummary(req, res) {
     try {
 
-        const summary = await transactionModel.aggregate([
+        const summary = await Transaction.aggregate([
             {
                 $match: {
                     companyId: req.user.companyId

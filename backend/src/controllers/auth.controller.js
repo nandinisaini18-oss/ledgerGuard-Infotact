@@ -2,12 +2,14 @@ import mongoose from "mongoose"
 import userModel from "../models/user.model.js"
 import companyModel from "../models/company.model.js"
 import createToken from "../utils/generateToken.js"
+import { getTenantConnection } from "../database/tenantConnection.js"
+import { getUserModel } from "../models/tenantUser.model.js";
 
 export async function registerUser(req , res){
     const {fullname , email , password , role , companyId} = req.body
 
     try{
-        const existingUser = await userModel.findOne({email})
+        const existingUser = await User.findOne({email})
 
         if(existingUser){
             return res.status(409).json({
@@ -23,16 +25,20 @@ export async function registerUser(req , res){
             });
         }
 
-        const companyExists = await companyModel.findById(companyId)
+        const companyExists = await companyModel.findById(companyId);
 
-        if(!companyExists){
+        if (!companyExists) {
             return res.status(404).json({
-                message : "company doesn't exists",
-                success : false
-            })
+                success: false,
+                message: "Company doesn't exist"
+            });
         }
 
-        const user = await userModel.create({
+        const connection = getTenantConnection(companyExists.databaseName);
+
+        const User = getUserModel(connection);
+
+        const user = await User.create({
             fullname,
             email,
             password,
@@ -54,7 +60,22 @@ export async function loginUser(req , res){
     const {email , password} = req.body
 
     try{
-        const user = await userModel.findOne({email}).select("+password")
+        const { companyId, email, password } = req.body;
+
+        const company = await companyModel.findById(companyId);
+
+        if (!company) {
+            return res.status(404).json({
+                success: false,
+                message: "Company not found"
+            });
+        }
+
+        const connection = getTenantConnection(company.databaseName);
+
+        const User = getUserModel(connection);
+
+        const user = await User.findOne({ email }).select("+password");
 
         if(!user){
             return res.status(404).json({

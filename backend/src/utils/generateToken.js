@@ -3,7 +3,8 @@ import {config} from "../config/config.js"
 
 function createToken(res , user , message , statusCode){
     const token = jwt.sign({
-        id : user._id
+        id: user._id,
+        companyId: user.companyId
         },config.JWT_SECRET,
         {expiresIn : config.EXPIRES_IN}
     )
