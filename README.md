@@ -362,3 +362,45 @@ LedgerGuard is a multi-tenant ledger management system where companies can regis
 - Introduce MongoDB ACID transactions using sessions
 - Implement automatic rollback for failed financial operations
 - Begin Week 2 Idempotent Ledger implementation
+
+
+
+
+
+## Day 13
+### Completed
+- Added Redis configuration using ioredis
+- Created a reusable Redis client
+- Implemented Idempotency middleware using `Idempotency-Key`
+- Added distributed locking with Redis (`SET NX EX`)
+- Generated unique `eventId` for every transaction using UUID
+- Added `eventId` field to Transaction schema
+- Implemented MongoDB multi-document transactions using sessions
+- Created Audit model for transaction history
+- Stored Transaction and Audit Log atomically inside the same MongoDB transaction
+- Added Redis caching for Analytics APIs
+- Implemented cache invalidation after Create, Update, and Delete transaction operations
+- Structured backend for idempotent financial transaction processing
+### Tested
+- MongoDB transaction commit and rollback
+- UUID event generation
+- Audit log creation
+- Analytics cache logic
+- Cache invalidation workflow
+> **Note:** Redis server installation and runtime testing are pending.
+### Learned
+- Redis fundamentals
+- Idempotent API design
+- Distributed locking using Redis
+- UUID-based event tracking
+- MongoDB ACID Transactions
+- Multi-document transactions
+- Audit logging
+- Cache-aside pattern
+- Cache invalidation strategies
+### Next Goal
+- Install and configure Redis locally
+- Test idempotent transaction retries
+- Verify distributed locking under concurrent requests
+- Complete tenant isolation testing
+- Begin Week 3 Analytics Pipeline
