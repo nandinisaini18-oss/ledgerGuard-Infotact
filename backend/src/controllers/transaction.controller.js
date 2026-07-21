@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
-import transactionModel from "../models/transaction.model.js";
 import companyModel from "../models/company.model.js";
+import redis from "../config/redis.js";
+import redisClient from "../config/redis.js";
+import { v4 as uuid } from "uuid";
+import { getAuditModel } from "../models/audit.model.js";
 import { getTenantConnection } from "../database/tenantConnection.js";
 import { getTransactionModel } from "../models/tenantTransaction.model.js";
 
@@ -25,15 +28,58 @@ export async function createTransaction(req, res) {
 
         const Transaction = getTransactionModel(connection);
 
-        const transaction = await Transaction.create({
-            title,
-            amount,
-            type,
-            category,
-            description,
-            companyId: req.user.companyId,
-            createdBy: req.user._id
-        });
+        const Audit = getAuditModel(connection);
+
+        const session = await connection.startSession();
+
+        session.startTransaction();
+
+        const [transaction] = await Transaction.create(
+            [
+                {
+                    eventId: uuid(),
+                    title,
+                    amount,
+                    type,
+                    category,
+                    description,
+                    companyId: req.user.companyId,
+                    createdBy: req.user._id
+                }
+            ],
+            { session }
+        );
+
+        await Audit.create(
+            [
+                {
+                    eventId: transaction.eventId,
+
+                    action: "CREATE",
+
+                    transactionId: transaction._id,
+
+                    companyId: req.user.companyId,
+
+                    performedBy: req.user._id
+                }
+            ],
+            { session }
+        );
+
+        await redis.set(
+            `idempotency:${req.idempotencyKey}`,
+            "processed",
+            "EX",
+            60 * 60
+        );
+
+        await redis.del(req.lockKey);
+
+        await session.commitTransaction();
+
+        session.endSession();await redisClient.del(`summary:${req.user.companyId}`);
+        await redisClient.del(`category:${req.user.companyId}`);
 
         return res.status(201).json({
             success: true,
@@ -42,6 +88,15 @@ export async function createTransaction(req, res) {
         });
 
     } catch (err) {
+        if (req.lockKey) {
+            await redis.del(req.lockKey);
+        }
+
+        if (session) {
+            await session.abortTransaction();
+            session.endSession();
+        }
+
         return res.status(500).json({
             success: false,
             message: "Internal server error"
@@ -54,6 +109,12 @@ export async function createTransaction(req, res) {
  */
 export async function getTransactions(req, res) {
     try {
+
+        const company = await companyModel.findById(req.user.companyId);
+
+        const connection = getTenantConnection(company.databaseName);
+
+        const Transaction = getTransactionModel(connection);
 
         // Read page and limit from query parameters
         const page = Number(req.query.page) || 1;
@@ -108,7 +169,6 @@ export async function getTransactions(req, res) {
         // Fetch paginated transactions
         const transactions = await Transaction.find(filter)
             .populate("createdBy", "fullname email role")
-            .populate("companyId", "companyName companyEmail subscriptionPlan")
             .sort(sortOption)
             .skip(skip)
             .limit(limit);
@@ -144,6 +204,13 @@ export async function getTransaction(req, res) {
     const { id } = req.params;
 
     try {
+
+        const company = await companyModel.findById(req.user.companyId);
+
+        const connection = getTenantConnection(company.databaseName);
+
+        const Transaction = getTransactionModel(connection);
+
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
                 success: false,
@@ -153,7 +220,6 @@ export async function getTransaction(req, res) {
 
        const transaction = await Transaction.findById(id)
             .populate("createdBy", "fullname email role")
-            .populate("companyId", "companyName companyEmail subscriptionPlan");
 
         if (!transaction) {
             return res.status(404).json({
@@ -194,6 +260,12 @@ export async function updateTransaction(req, res) {
 
     try {
 
+        const company = await companyModel.findById(req.user.companyId);
+
+        const connection = getTenantConnection(company.databaseName);
+
+        const Transaction = getTransactionModel(connection);
+
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
                 success: false,
@@ -227,6 +299,9 @@ export async function updateTransaction(req, res) {
 
         await transaction.save();
 
+        await redisClient.del(`summary:${req.user.companyId}`);
+        await redisClient.del(`category:${req.user.companyId}`);
+
         return res.status(200).json({
             success: true,
             message: "Transaction updated successfully",
@@ -253,6 +328,11 @@ export async function deleteTransaction(req, res) {
     const { id } = req.params;
 
     try {
+        const company = await companyModel.findById(req.user.companyId);
+
+        const connection = getTenantConnection(company.databaseName);
+
+        const Transaction = getTransactionModel(connection);
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
@@ -279,6 +359,9 @@ export async function deleteTransaction(req, res) {
         }
 
         await transaction.deleteOne();
+
+        await redisClient.del(`summary:${req.user.companyId}`);
+        await redisClient.del(`category:${req.user.companyId}`);    
 
         return res.status(200).json({
             success: true,

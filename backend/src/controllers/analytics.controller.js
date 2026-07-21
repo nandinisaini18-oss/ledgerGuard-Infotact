@@ -1,5 +1,27 @@
+import companyModel from "../models/company.model.js";
+import redisClient from "../config/redis.js";
+import { getTenantConnection } from "../database/tenantConnection.js";
+import { getTransactionModel } from "../models/tenantTransaction.model.js";
+
 export async function getCategoryAnalytics(req, res) {
     try {
+        const cacheKey = `category:${req.user.companyId}`;
+
+        const cachedData = await redisClient.get(cacheKey);
+
+        if (cachedData) {
+            return res.status(200).json({
+                success: true,
+                categories: JSON.parse(cachedData),
+                cached: true
+            });
+        }
+
+        const company = await companyModel.findById(req.user.companyId);
+
+        const connection = getTenantConnection(company.databaseName);
+
+        const Transaction = getTransactionModel(connection);
 
         const categories = await Transaction.aggregate([
             {
@@ -22,6 +44,14 @@ export async function getCategoryAnalytics(req, res) {
             }
         ]);
 
+        await redisClient.set(
+            cacheKey,
+            JSON.stringify(categories),
+            {
+                EX: 300
+            }
+        );
+
         return res.status(200).json({
             success: true,
             categories
@@ -40,6 +70,12 @@ export async function getCategoryAnalytics(req, res) {
 export async function getTransactionSummary(req, res) {
     try {
 
+        const company = await companyModel.findById(req.user.companyId);
+
+        const connection = getTenantConnection(company.databaseName);
+
+        const Transaction = getTransactionModel(connection);
+
         const summary = await Transaction.aggregate([
             {
                 $match: {
@@ -55,6 +91,37 @@ export async function getTransactionSummary(req, res) {
                 }
             }
         ]);
+
+        const cacheKey = `summary:${req.user.companyId}`;
+
+        const cachedData = await redisClient.get(cacheKey);
+
+        if (cachedData) {
+            return res.status(200).json({
+                success: true,
+                ...JSON.parse(cachedData),
+                cached: true
+            });
+        }
+
+        const result = {
+            totalIncome,
+            totalExpense,
+            balance: totalIncome - totalExpense
+        };
+
+        await redisClient.set(
+            cacheKey,
+            JSON.stringify(result),
+            {
+                EX: 300
+            }
+        );
+
+        return res.status(200).json({
+            success: true,
+            ...result
+        });
 
         let totalIncome = 0;
         let totalExpense = 0;

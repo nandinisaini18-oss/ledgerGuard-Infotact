@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authorizeRoles } from "../middlewares/role.middleware.js";
+import { idempotencyMiddleware } from "../middlewares/idempotency.middleware.js";
 
 import {
     createTransaction,
@@ -12,6 +13,7 @@ import {
 import { authenticateUser } from "../middlewares/auth.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { transactionValidation } from "../validation/transaction.validation.js";
+import { distributedLock } from "../middlewares/distributedLock.middleware.js";
 
 const transactionRouter = Router();
 
@@ -19,10 +21,13 @@ transactionRouter.post(
     "/",
     authenticateUser,
     authorizeRoles("admin"),
+    distributedLock,
+    idempotencyMiddleware,
     transactionValidation,
     validate,
     createTransaction
 );
+
 transactionRouter.get(
     "/",
     authenticateUser,

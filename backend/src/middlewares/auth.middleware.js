@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken"
 import { config } from "../config/config.js"
-import userModel from "../models/user.model.js"
+import companyModel from "../models/company.model.js";
+import { getTenantConnection } from "../database/tenantConnection.js";
+import { getUserModel } from "../models/tenantUser.model.js";
 
 export async function authenticateUser(req , res , next){
     const token = req.cookies.token
@@ -29,7 +31,7 @@ export async function authenticateUser(req , res , next){
         const User = getUserModel(connection);
 
 
-        const user = await userModel.findById(decoded.id).select("-password");
+        const user = await User.findById(decoded.id).select("-password");
 
         if(!user){
             return res.status(404).json({

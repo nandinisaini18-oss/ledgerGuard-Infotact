@@ -29,6 +29,10 @@ export const registerValidation = [
 ]
 
 export const loginValidation = [
+    body("companyId")
+    .notEmpty().withMessage("Company ID is required")
+    .isMongoId().withMessage("Invalid Company ID"),
+    
     body("email")
     .trim()
     .notEmpty().withMessage("email can't be empty")
@@ -38,4 +42,5 @@ export const loginValidation = [
     .trim()
     .notEmpty().withMessage("password can't be empty")
     .isLength({min : 6}).withMessage("password must be 6 characters long"),
+    
 ]

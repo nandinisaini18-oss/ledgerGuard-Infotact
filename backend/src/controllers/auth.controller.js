@@ -1,5 +1,4 @@
 import mongoose from "mongoose"
-import userModel from "../models/user.model.js"
 import companyModel from "../models/company.model.js"
 import createToken from "../utils/generateToken.js"
 import { getTenantConnection } from "../database/tenantConnection.js"
@@ -9,15 +8,6 @@ export async function registerUser(req , res){
     const {fullname , email , password , role , companyId} = req.body
 
     try{
-        const existingUser = await User.findOne({email})
-
-        if(existingUser){
-            return res.status(409).json({
-                message : "user with this email already exists",
-                success : false
-            })
-        }
-
         if (!mongoose.Types.ObjectId.isValid(companyId)) {
             return res.status(400).json({
                 success: false,
@@ -29,14 +19,23 @@ export async function registerUser(req , res){
 
         if (!companyExists) {
             return res.status(404).json({
-                success: false,
-                message: "Company doesn't exist"
+                success:false,
+                message:"Company doesn't exist"
             });
         }
 
         const connection = getTenantConnection(companyExists.databaseName);
 
         const User = getUserModel(connection);
+
+        const existingUser = await User.findOne({ email });
+
+        if(existingUser){
+            return res.status(409).json({
+                message : "user with this email already exists",
+                success : false
+            })
+        }
 
         const user = await User.create({
             fullname,
@@ -57,7 +56,6 @@ export async function registerUser(req , res){
 }
 
 export async function loginUser(req , res){
-    const {email , password} = req.body
 
     try{
         const { companyId, email, password } = req.body;

@@ -17,7 +17,6 @@ app.use(cors({
 
 app.use(cookieParser())
 app.use(express.json())
-app.use(errorHandler);
 
 app.use("/api/auth/user" , authRouter)
 app.use("/api/auth/company" , companyRouter)
@@ -30,5 +29,7 @@ app.get("/", (req, res) => {
         message: "LedgerGuard API Running",
     })
 })
+
+app.use(errorHandler);
 
 export default app
