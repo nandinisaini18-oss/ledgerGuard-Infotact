@@ -1,5 +1,3 @@
-"use client"
-
 import { useNavigate, Outlet, Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { logoutUser } from '../../services/user'
@@ -31,6 +29,12 @@ export default function DashboardLayout() {
               className={`dashboard-header__nav-link ${location.pathname === '/dashboard' ? 'dashboard-header__nav-link--active' : ''}`}
             >
               Dashboard
+            </Link>
+            <Link
+              to="/transactions"
+              className={`dashboard-header__nav-link ${location.pathname.startsWith('/transactions') ? 'dashboard-header__nav-link--active' : ''}`}
+            >
+              Transactions
             </Link>
             <Link
               to="/analytics"

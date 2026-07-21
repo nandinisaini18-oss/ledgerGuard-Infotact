@@ -15,6 +15,7 @@ import ViewTransaction from '../pages/ViewTransaction'
 import Analytics from '../pages/Analytics'
 import ProtectedRoute from '../components/ProtectedRoute'
 import AdminRoute from '../components/AdminRoute'
+import NotFound from '../pages/NotFound'
 import { AuthProvider, useAuth } from '../context'
 
 function PublicLayout() {
@@ -46,7 +47,7 @@ function AppRoutesInner() {
             <Route path="/register-company" element={<Navigate to="/" replace />} />
             <Route path="/register-user" element={<Navigate to="/" replace />} />
             <Route path="/login" element={<Navigate to="/" replace />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<NotFound />} />
             <Route
               element={
                 <ProtectedRoute>
@@ -68,7 +69,7 @@ function AppRoutesInner() {
             <Route path="/register-company" element={<CompanyRegistration />} />
             <Route path="/register-user" element={<UserRegistration />} />
             <Route path="/login" element={<Login />} />
-            <Route path="*" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
         )}
       </Routes>

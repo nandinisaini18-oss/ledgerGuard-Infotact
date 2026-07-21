@@ -114,14 +114,9 @@ function UserRegistration() {
           message="The user has been registered and can now access the platform."
         />
         <div className="form-container__actions">
-          <button
-            type="button"
-            onClick={handleRegisterAnother}
-            className="btn btn--primary btn--full-width"
-            style={{ padding:"10px 0px" }}
-          >
+          <Button variant="primary" fullWidth onClick={handleRegisterAnother}>
             Register Another User
-          </button>
+          </Button>
           <Link to="/">
             <Button variant="secondary" fullWidth>
               Back to Home

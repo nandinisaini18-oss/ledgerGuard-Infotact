@@ -54,7 +54,8 @@ function Navbar() {
           <NavLink
             to="/register-company"
             className={({ isActive }) =>
-              `navbar__link ${isActive ? 'navbar__link--active' : ''}`}
+              `navbar__link ${isActive ? 'navbar__link--active' : ''}`
+            }
             onClick={() => setOpen(false)}
           >
             Register Company
@@ -62,7 +63,8 @@ function Navbar() {
           <NavLink
             to="/register-user"
             className={({ isActive }) =>
-              `navbar__link ${isActive ? 'navbar__link--active' : ''}`}
+              `navbar__link ${isActive ? 'navbar__link--active' : ''}`
+            }
             onClick={() => setOpen(false)}
           >
             Register User
@@ -70,7 +72,8 @@ function Navbar() {
           <NavLink
             to="/login"
             className={({ isActive }) =>
-              `navbar__link ${isActive ? 'navbar__link--active' : ''}`}
+              `navbar__link ${isActive ? 'navbar__link--active' : ''}`
+            }
             onClick={() => setOpen(false)}
           >
             Login
