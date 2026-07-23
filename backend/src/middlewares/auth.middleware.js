@@ -8,7 +8,9 @@ export async function authenticateUser(req , res , next){
     const token = req.cookies.token
 
     try{
+
         if(!token){
+            
             return res.status(401).json({
                 message : "Unauthorised access",
                 success : false
