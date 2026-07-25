@@ -89,17 +89,6 @@ function Login() {
 
         <div className="form-container__fields">
 
-          <Input
-            label="Company ID"
-            id="companyId"
-            name="companyId"
-            type="text"
-            placeholder="e.g. 64a1b2c3d4e5f67890123456"
-            value={form.companyId}
-            onChange={handleChange}
-            error={errors.companyId}
-            autoComplete="off"
-          />
 
           <Input
             label="Email"
@@ -125,6 +114,17 @@ function Login() {
             autoComplete="current-password"
           />
 
+          <Input
+            label="Company ID"
+            id="companyId"
+            name="companyId"
+            type="text"
+            placeholder="e.g. 64a1b2c3d4e5f67890123456"
+            value={form.companyId}
+            onChange={handleChange}
+            error={errors.companyId}
+            autoComplete="off"
+          />
         </div>
 
         <div className="form-container__actions">
