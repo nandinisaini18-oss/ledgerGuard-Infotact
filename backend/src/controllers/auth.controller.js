@@ -58,9 +58,11 @@ export async function registerUser(req , res){
 export async function loginUser(req , res){
 
     try{
-        const { companyId, email, password } = req.body;
+        const { companyName, email, password } = req.body;
 
-        const company = await companyModel.findById(companyId);
+        const company = await companyModel.findOne({
+            companyName: companyName.trim()
+        });
 
         if (!company) {
             return res.status(404).json({

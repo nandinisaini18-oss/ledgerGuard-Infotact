@@ -29,9 +29,9 @@ export const registerValidation = [
 ]
 
 export const loginValidation = [
-    body("companyId")
-    .notEmpty().withMessage("Company ID is required")
-    .isMongoId().withMessage("Invalid Company ID"),
+     body("companyName")
+        .trim()
+        .notEmpty().withMessage("Company name is required"),
     
     body("email")
     .trim()
