@@ -6,7 +6,6 @@ import Button from '../components/ui/Button'
 import Alert from '../components/ui/Alert'
 import { registerUser } from '../services/user'
 import {
-  validateRequired,
   validateFullName,
   validateEmail,
   validatePassword,
@@ -52,7 +51,6 @@ function UserRegistration() {
       email: () => validateEmail(form.email),
       password: () => validatePassword(form.password),
       confirmPassword: () => validatePasswordMatch(form.password, form.confirmPassword),
-      role: () => validateRequired(form.role, 'Role'),
       companyId: () => validateMongoId(form.companyId, 'Company ID'),
     })
   }
@@ -72,9 +70,9 @@ function UserRegistration() {
         fullname: form.fullname,
         email: form.email,
         password: form.password,
-        role: form.role,
         companyId: form.companyId,
       }
+      if (form.role) payload.role = form.role
       await registerUser(payload)
       setSuccess(true)
       setForm(initialForm)

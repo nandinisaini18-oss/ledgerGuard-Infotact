@@ -366,7 +366,7 @@ export default function ViewTransaction() {
                 </div>
               )}
 
-              {/* Company */}
+              {/* Company ID */}
               {transaction.companyId && (
                 <div className="vt-meta-item">
                   <div className="vt-meta-item__icon" aria-hidden="true">
@@ -381,8 +381,8 @@ export default function ViewTransaction() {
                     </svg>
                   </div>
                   <div className="vt-meta-item__content">
-                    <span className="vt-meta-item__label">Company</span>
-                    <span className="vt-meta-item__value">{transaction.companyId.companyName || formatShortId(transaction.companyId._id)}</span>
+                    <span className="vt-meta-item__label">Company ID</span>
+                    <span className="vt-meta-item__value vt-meta-item__value--mono">{String(transaction.companyId)}</span>
                   </div>
                 </div>
               )}

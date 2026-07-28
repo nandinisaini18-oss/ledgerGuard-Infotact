@@ -1,7 +1,10 @@
 import api from './api'
 
 export function createTransaction(data) {
-  return api.post('/api/transactions', data)
+  const idempotencyKey = crypto.randomUUID()
+  return api.post('/api/transactions', data, {
+    headers: { 'Idempotency-Key': idempotencyKey }
+  })
 }
 
 export function getTransactions({ page, limit, type, category, search, sort } = {}) {

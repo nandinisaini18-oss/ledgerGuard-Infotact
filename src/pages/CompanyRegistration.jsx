@@ -7,6 +7,13 @@ import Alert from '../components/ui/Alert'
 import { registerCompany } from '../services/company'
 import { validateRequired, validateEmail, validateForm } from '../utils/validators'
 
+function validateCompanyName(value) {
+  const required = validateRequired(value, 'Company name')
+  if (required) return required
+  if (value.trim().length < 3) return 'Company name must be at least 3 characters'
+  return ''
+}
+
 const subscriptionOptions = [
   { value: '', label: 'Select a plan\u2026' },
   { value: 'basic', label: 'Basic' },
@@ -38,9 +45,8 @@ function CompanyRegistration() {
 
   function validate() {
     return validateForm({
-      companyName: () => validateRequired(form.companyName, 'Company name'),
+      companyName: () => validateCompanyName(form.companyName),
       companyEmail: () => validateEmail(form.companyEmail),
-      subscriptionPlan: () => validateRequired(form.subscriptionPlan, 'Subscription plan'),
     })
   }
 
@@ -55,7 +61,12 @@ function CompanyRegistration() {
 
     setLoading(true)
     try {
-      await registerCompany(form)
+      const payload = {
+        companyName: form.companyName,
+        companyEmail: form.companyEmail,
+      }
+      if (form.subscriptionPlan) payload.subscriptionPlan = form.subscriptionPlan
+      await registerCompany(payload)
       setSuccess(true)
       setForm(initialForm)
     } catch (err) {

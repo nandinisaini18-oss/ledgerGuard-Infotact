@@ -5,13 +5,13 @@ import Input from '../components/ui/Input'
 import Button from '../components/ui/Button'
 import Alert from '../components/ui/Alert'
 import { loginUser } from '../services/user'
-import { validateRequired, validateEmail, validatePassword, validateMongoId, validateForm } from '../utils/validators'
+import { validateRequired, validateEmail, validatePassword, validateForm } from '../utils/validators'
 import { useAuth } from '../context'
 
 const initialForm = {
   email: '',
   password: '',
-  companyId: '',
+  companyName: '',
 }
 
 function Login() {
@@ -35,7 +35,7 @@ function Login() {
     return validateForm({
       email: () => validateEmail(form.email),
       password: () => validatePassword(form.password),
-      companyId: () => validateMongoId(form.companyId, 'Company ID'),
+      companyName: () => validateRequired(form.companyName, 'Company name'),
     })
   }
 
@@ -115,15 +115,15 @@ function Login() {
           />
 
           <Input
-            label="Company ID"
-            id="companyId"
-            name="companyId"
+            label="Company Name"
+            id="companyName"
+            name="companyName"
             type="text"
-            placeholder="e.g. 64a1b2c3d4e5f67890123456"
-            value={form.companyId}
+            placeholder="e.g. Acme Inc."
+            value={form.companyName}
             onChange={handleChange}
-            error={errors.companyId}
-            autoComplete="off"
+            error={errors.companyName}
+            autoComplete="organization"
           />
         </div>
 
