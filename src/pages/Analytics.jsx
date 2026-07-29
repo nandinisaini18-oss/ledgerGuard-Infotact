@@ -77,16 +77,13 @@ export default function Analytics() {
 
   useEffect(() => {
     let cancelled = false
+    let summaryFailed = false
+    let categoryFailed = false
 
     async function fetchAnalytics() {
       try {
-        const [summaryRes, categoryRes] = await Promise.all([
-          getTransactionSummary(),
-          getCategoryAnalytics(),
-        ])
-
+        const summaryRes = await getTransactionSummary()
         if (cancelled) return
-
         if (summaryRes.data?.success) {
           setSummary({
             totalIncome: summaryRes.data.totalIncome || 0,
@@ -94,14 +91,25 @@ export default function Analytics() {
             balance: summaryRes.data.balance || 0,
           })
         }
+      } catch {
+        summaryFailed = true
+      }
 
+      try {
+        const categoryRes = await getCategoryAnalytics()
+        if (cancelled) return
         if (categoryRes.data?.success) {
           setCategories(categoryRes.data.categories || [])
         }
-      } catch (err) {
-        if (!cancelled) setError(err.message || 'Failed to load analytics data')
+      } catch {
+        categoryFailed = true
       } finally {
-        if (!cancelled) setLoading(false)
+        if (!cancelled) {
+          if (summaryFailed && categoryFailed) {
+            setError('Failed to load analytics data')
+          }
+          setLoading(false)
+        }
       }
     }
 

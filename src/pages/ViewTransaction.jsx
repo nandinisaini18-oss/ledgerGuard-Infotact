@@ -179,9 +179,9 @@ export default function ViewTransaction() {
               <Link to="/transactions">
                 <Button variant="secondary">Back to Transactions</Button>
               </Link>
-              <button type="button" onClick={handleRetry} className="btn btn--ghost">
+              <Button variant="ghost" onClick={handleRetry}>
                 Retry
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -354,7 +354,7 @@ export default function ViewTransaction() {
                   </div>
                   <div className="vt-meta-item__content">
                     <span className="vt-meta-item__label">Created By</span>
-                    {user && transaction.createdBy._id === user.id ? (
+                    {user && String(transaction.createdBy._id) === user.id ? (
                       <>
                         <span className="vt-meta-item__value">{transaction.createdBy.fullname || user.fullname}</span>
                         <span className="vt-meta-item__sub">ID: {formatShortId(transaction.createdBy._id)}</span>

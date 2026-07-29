@@ -17,6 +17,7 @@ const emptyForm = {
 export default function CreateTransaction() {
   const [success, setSuccess] = useState(false)
   const [showResetMessage, setShowResetMessage] = useState(false)
+  const [formKey, setFormKey] = useState(0)
 
   useEffect(() => {
     if (success) {
@@ -31,6 +32,7 @@ export default function CreateTransaction() {
   function handleReset() {
     setSuccess(false)
     setShowResetMessage(false)
+    setFormKey((k) => k + 1)
   }
 
   async function handleSubmit(payload) {
@@ -74,6 +76,7 @@ export default function CreateTransaction() {
 
   return (
     <TransactionForm
+      key={formKey}
       initialData={emptyForm}
       onSubmit={handleSubmit}
       title="Create transaction"

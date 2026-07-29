@@ -11,11 +11,11 @@ export default function DashboardLayout() {
   async function handleLogout() {
     try {
       await logoutUser()
-      setUser(null)
-      navigate('/')
     } catch {
-      // Error handled by logout API
+      // API call failed — log out locally anyway
     }
+    setUser(null)
+    navigate('/')
   }
 
   return (

@@ -2,6 +2,7 @@ import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
 import DashboardLayout from '../components/layout/DashboardLayout'
 import Footer from '../components/layout/Footer'
+import Spinner from '../components/ui/Spinner'
 import Home from '../pages/Home'
 import AuthenticatedHome from '../pages/AuthenticatedHome'
 import CompanyRegistration from '../pages/CompanyRegistration'
@@ -33,7 +34,13 @@ function PublicLayout() {
 function AppRoutesInner() {
   const { authenticated, loading } = useAuth()
 
-  if (loading) return null
+  if (loading) {
+    return (
+      <div className="route-loading">
+        <Spinner size="lg" />
+      </div>
+    )
+  }
 
   return (
     <>

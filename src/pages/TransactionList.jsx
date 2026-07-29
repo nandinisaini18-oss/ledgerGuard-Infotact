@@ -118,6 +118,11 @@ export default function TransactionList() {
   const [totalTransactions, setTotalTransactions] = useState(0)
   const [filterLoading, setFilterLoading] = useState(false)
   const hasLoaded = useRef(false)
+  const [retryKey, setRetryKey] = useState(0)
+
+  const handleRetry = useCallback(() => {
+    setRetryKey((k) => k + 1)
+  }, [])
 
   const handleCategoryChange = useCallback((e) => {
     const value = e.target.value
@@ -176,7 +181,7 @@ export default function TransactionList() {
     }
 
     fetchTransactions()
-  }, [currentPage, limit, filterType, debouncedCategory, debouncedSearch, sort])
+  }, [currentPage, limit, filterType, debouncedCategory, debouncedSearch, sort, retryKey])
 
   useEffect(() => {
     if (!flash) return
@@ -253,6 +258,11 @@ export default function TransactionList() {
       {error && (
         <div className="transaction-list__error" role="alert">
           <Alert variant="error" message={error} />
+          <div style={{ marginTop: 'var(--space-3)' }}>
+            <Button variant="secondary" size="sm" onClick={handleRetry}>
+              Retry
+            </Button>
+          </div>
         </div>
       )}
 

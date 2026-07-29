@@ -92,6 +92,7 @@ function UserRegistration() {
       setSuccess(false)
       setForm(initialForm)
       setErrors({})
+      setSubmitError('')
     }
 
     return (

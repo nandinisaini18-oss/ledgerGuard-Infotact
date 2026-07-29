@@ -11,11 +11,11 @@ export default function AuthenticatedHome() {
   async function handleLogout() {
     try {
       await logoutUser()
-      setUser(null)
-      navigate('/')
     } catch {
-      // handled by API interceptor
+      // API call failed — log out locally anyway
     }
+    setUser(null)
+    navigate('/')
   }
 
   const displayName = user?.fullname || 'there'

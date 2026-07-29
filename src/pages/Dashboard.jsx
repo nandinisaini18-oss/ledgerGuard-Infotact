@@ -1,8 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import useIsAdmin from '../hooks/useIsAdmin'
-import { logoutUser } from '../services/user'
 import { getTransactions } from '../services/transaction'
 import { getTransactionSummary } from '../services/analytics'
 import Button from '../components/ui/Button'
@@ -83,9 +82,8 @@ const typeIcons = {
 }
 
 export default function Dashboard() {
-  const { user, setUser } = useAuth()
+  const { user } = useAuth()
   const isAdmin = useIsAdmin()
-  const navigate = useNavigate()
   const [recentTransactions, setRecentTransactions] = useState([])
   const [totalCount, setTotalCount] = useState(0)
   const [totalIncome, setTotalIncome] = useState(0)
@@ -102,45 +100,43 @@ export default function Dashboard() {
 
   useEffect(() => {
     let cancelled = false
+    let recentFailed = false
+    let summaryFailed = false
 
     async function fetchDashboardData() {
       try {
-        const [recentRes, summaryRes] = await Promise.all([
-          getTransactions({ page: 1, limit: 5 }),
-          getTransactionSummary(),
-        ])
-
+        const recentRes = await getTransactions({ page: 1, limit: 5 })
         if (cancelled) return
-
         if (recentRes.data?.success) {
           setRecentTransactions(recentRes.data.transactions || [])
           setTotalCount(recentRes.data.totalTransactions || 0)
         }
+      } catch {
+        recentFailed = true
+      }
 
+      try {
+        const summaryRes = await getTransactionSummary()
+        if (cancelled) return
         if (summaryRes.data?.success) {
           setTotalIncome(summaryRes.data.totalIncome || 0)
           setTotalExpense(summaryRes.data.totalExpense || 0)
         }
-      } catch (err) {
-        if (!cancelled) setError(err.message || 'Failed to load dashboard data')
+      } catch {
+        summaryFailed = true
       } finally {
-        if (!cancelled) setLoading(false)
+        if (!cancelled) {
+          if (recentFailed && summaryFailed) {
+            setError('Failed to load dashboard data')
+          }
+          setLoading(false)
+        }
       }
     }
 
     fetchDashboardData()
     return () => { cancelled = true }
   }, [retryKey])
-
-  async function handleLogout() {
-    try {
-      await logoutUser()
-      setUser(null)
-      navigate('/')
-    } catch {
-      // Logout failed
-    }
-  }
 
   return (
     <div className="dash">
