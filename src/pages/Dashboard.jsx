@@ -100,8 +100,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     let cancelled = false
-    let recentFailed = false
-    let summaryFailed = false
+    let errors = []
 
     async function fetchDashboardData() {
       try {
@@ -112,7 +111,7 @@ export default function Dashboard() {
           setTotalCount(recentRes.data.totalTransactions || 0)
         }
       } catch {
-        recentFailed = true
+        errors.push('recent transactions')
       }
 
       try {
@@ -123,14 +122,14 @@ export default function Dashboard() {
           setTotalExpense(summaryRes.data.totalExpense || 0)
         }
       } catch {
-        summaryFailed = true
-      } finally {
-        if (!cancelled) {
-          if (recentFailed && summaryFailed) {
-            setError('Failed to load dashboard data')
-          }
-          setLoading(false)
+        errors.push('financial summary')
+      }
+
+      if (!cancelled) {
+        if (errors.length > 0) {
+          setError(`Failed to load: ${errors.join(', ')}`)
         }
+        setLoading(false)
       }
     }
 

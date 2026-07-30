@@ -77,8 +77,7 @@ export default function Analytics() {
 
   useEffect(() => {
     let cancelled = false
-    let summaryFailed = false
-    let categoryFailed = false
+    let errors = []
 
     async function fetchAnalytics() {
       try {
@@ -92,7 +91,7 @@ export default function Analytics() {
           })
         }
       } catch {
-        summaryFailed = true
+        errors.push('financial summary')
       }
 
       try {
@@ -102,14 +101,14 @@ export default function Analytics() {
           setCategories(categoryRes.data.categories || [])
         }
       } catch {
-        categoryFailed = true
-      } finally {
-        if (!cancelled) {
-          if (summaryFailed && categoryFailed) {
-            setError('Failed to load analytics data')
-          }
-          setLoading(false)
+        errors.push('category breakdown')
+      }
+
+      if (!cancelled) {
+        if (errors.length > 0) {
+          setError(`Failed to load: ${errors.join(', ')}`)
         }
+        setLoading(false)
       }
     }
 
