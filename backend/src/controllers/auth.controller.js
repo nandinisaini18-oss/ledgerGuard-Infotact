@@ -1,6 +1,8 @@
 import mongoose from "mongoose"
+import jwt from "jsonwebtoken"
 import companyModel from "../models/company.model.js"
 import createToken from "../utils/generateToken.js"
+import redis from "../config/redis.js"
 import { getTenantConnection } from "../database/tenantConnection.js"
 import { getUserModel } from "../models/tenantUser.model.js";
 
@@ -18,9 +20,9 @@ export async function registerUser(req , res){
         const companyExists = await companyModel.findById(companyId);
 
         if (!companyExists) {
-            return res.status(404).json({
+            return res.status(400).json({
                 success:false,
-                message:"Company doesn't exist"
+                message:"Registration failed"
             });
         }
 
@@ -41,7 +43,7 @@ export async function registerUser(req , res){
             fullname,
             email,
             password,
-            role,
+            role: "user",
             companyId
         })
 
@@ -65,9 +67,9 @@ export async function loginUser(req , res){
         });
 
         if (!company) {
-            return res.status(404).json({
+            return res.status(401).json({
                 success: false,
-                message: "Company not found"
+                message: "Invalid email or password"
             });
         }
 
@@ -78,9 +80,9 @@ export async function loginUser(req , res){
         const user = await User.findOne({ email }).select("+password");
 
         if(!user){
-            return res.status(404).json({
+            return res.status(401).json({
                 success : false,
-                message : "user not found"
+                message : "Invalid email or password"
             })
         }
 
@@ -89,7 +91,7 @@ export async function loginUser(req , res){
         if(!isPasswordMatched){
             return res.status(401).json({
                 success : false,
-                message : "Invalid credentials"
+                message : "Invalid email or password"
             })
         }
 
@@ -133,10 +135,25 @@ export async function getUser(req , res){
 }
 
 export async function logOutUser(req , res){
+    try {
+        const token = req.cookies.token;
+        if (token) {
+            const decoded = jwt.decode(token);
+            if (decoded && decoded.jti) {
+                const ttl = decoded.exp
+                    ? Math.max(decoded.exp - Math.floor(Date.now() / 1000), 60)
+                    : 3600;
+                await redis.set(`bl:${decoded.jti}`, "1", "EX", ttl);
+            }
+        }
+    } catch {
+        // Token invalid or Redis unavailable — clear cookie anyway
+    }
+
     res.clearCookie("token" , {
         httpOnly: true,
         sameSite: "lax",
-        secure: false
+        secure: process.env.NODE_ENV === "production"
     })
 
     res.status(200).json({

@@ -1,8 +1,9 @@
+import crypto from "crypto"
 import companyModel from "../models/company.model.js"
 
 export async function registerCompany(req , res){
     const {companyName , companyEmail , subscriptionPlan } = req.body
-    const databaseName = `company_${companyName.toLowerCase().replace(/\s+/g, "_")}`;
+    const databaseName = `company_${companyName.toLowerCase().replace(/\s+/g, "_")}_${crypto.randomBytes(3).toString("hex")}`;
 
     try{
          const isCompanyExists = await companyModel.findOne({

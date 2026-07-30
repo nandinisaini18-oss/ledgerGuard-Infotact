@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken"
 import { config } from "../config/config.js"
+import redis from "../config/redis.js"
 import companyModel from "../models/company.model.js";
 import { getTenantConnection } from "../database/tenantConnection.js";
 import { getUserModel } from "../models/tenantUser.model.js";
@@ -18,6 +19,18 @@ export async function authenticateUser(req , res , next){
         }
 
         const decoded = jwt.verify(token, config.JWT_SECRET);
+
+        try {
+            const blacklisted = await redis.get(`bl:${decoded.jti}`);
+            if (blacklisted) {
+                return res.status(401).json({
+                    success: false,
+                    message: "Invalid or expired token"
+                });
+            }
+        } catch {
+            // Redis unavailable — proceed without blacklist check
+        }
 
         const company = await companyModel.findById(decoded.companyId);
 

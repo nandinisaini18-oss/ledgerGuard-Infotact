@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import companyModel from "../models/company.model.js";
 import redis from "../config/redis.js";
-import redisClient from "../config/redis.js";
 import { v4 as uuid } from "uuid";
 import { getAuditModel } from "../models/audit.model.js";
 import { getTenantConnection } from "../database/tenantConnection.js";
@@ -67,6 +66,10 @@ export async function createTransaction(req, res) {
             { session }
         );
 
+        await session.commitTransaction();
+
+        session.endSession();
+
         await redis.set(
             `idempotency:${req.idempotencyKey}`,
             "processed",
@@ -76,10 +79,8 @@ export async function createTransaction(req, res) {
 
         await redis.del(req.lockKey);
 
-        await session.commitTransaction();
-
-        session.endSession();await redisClient.del(`summary:${req.user.companyId}`);
-        await redisClient.del(`category:${req.user.companyId}`);
+        await redis.del(`summary:${req.user.companyId}`);
+        await redis.del(`category:${req.user.companyId}`);
 
         return res.status(201).json({
             success: true,
@@ -299,8 +300,8 @@ export async function updateTransaction(req, res) {
 
         await transaction.save();
 
-        await redisClient.del(`summary:${req.user.companyId}`);
-        await redisClient.del(`category:${req.user.companyId}`);
+        await redis.del(`summary:${req.user.companyId}`);
+        await redis.del(`category:${req.user.companyId}`);
 
         return res.status(200).json({
             success: true,
@@ -360,8 +361,8 @@ export async function deleteTransaction(req, res) {
 
         await transaction.deleteOne();
 
-        await redisClient.del(`summary:${req.user.companyId}`);
-        await redisClient.del(`category:${req.user.companyId}`);    
+        await redis.del(`summary:${req.user.companyId}`);
+        await redis.del(`category:${req.user.companyId}`);    
 
         return res.status(200).json({
             success: true,

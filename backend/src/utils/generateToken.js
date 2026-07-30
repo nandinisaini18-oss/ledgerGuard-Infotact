@@ -1,10 +1,12 @@
 import jwt from "jsonwebtoken"
+import { v4 as uuid } from "uuid"
 import {config} from "../config/config.js"
 
 function createToken(res , user , message , statusCode){
     const token = jwt.sign({
         id: user._id,
-        companyId: user.companyId
+        companyId: user.companyId,
+        jti: uuid()
         },config.JWT_SECRET,
         {expiresIn : config.EXPIRES_IN}
     )
@@ -12,7 +14,7 @@ function createToken(res , user , message , statusCode){
     res.cookie("token" , token , {
         httpOnly : true,
         sameSite : "lax",
-        secure : false
+        secure : process.env.NODE_ENV === "production"
     })
 
     res.status(statusCode).json({

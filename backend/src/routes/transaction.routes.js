@@ -12,7 +12,7 @@ import {
 
 import { authenticateUser } from "../middlewares/auth.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
-import { transactionValidation } from "../validation/transaction.validation.js";
+import { transactionValidation, updateTransactionValidation } from "../validation/transaction.validation.js";
 import { distributedLock } from "../middlewares/distributedLock.middleware.js";
 
 const transactionRouter = Router();
@@ -44,7 +44,7 @@ transactionRouter.put(
     "/:id",
     authenticateUser,
     authorizeRoles("admin"),
-    transactionValidation,
+    updateTransactionValidation,
     validate,
     updateTransaction
 );

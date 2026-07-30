@@ -13,6 +13,14 @@ export function getTenantConnection(databaseName) {
         `${config.MONGO_URI}/${databaseName}`
     );
 
+    connection.on("error", () => {
+        delete connections[databaseName];
+    });
+
+    connection.on("disconnected", () => {
+        delete connections[databaseName];
+    });
+
     connections[databaseName] = connection;
 
     return connection;

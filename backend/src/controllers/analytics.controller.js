@@ -7,7 +7,12 @@ export async function getCategoryAnalytics(req, res) {
     try {
         const cacheKey = `category:${req.user.companyId}`;
 
-        const cachedData = await redisClient.get(cacheKey);
+        let cachedData = null;
+        try {
+            cachedData = await redisClient.get(cacheKey);
+        } catch {
+            // Redis unavailable — skip cache
+        }
 
         if (cachedData) {
             return res.status(200).json({
@@ -44,13 +49,17 @@ export async function getCategoryAnalytics(req, res) {
             }
         ]);
 
-        await redisClient.set(
-            cacheKey,
-            JSON.stringify(categories),
-            {
-                EX: 300
-            }
-        );
+        try {
+            await redisClient.set(
+                cacheKey,
+                JSON.stringify(categories),
+                {
+                    EX: 300
+                }
+            );
+        } catch {
+            // Redis unavailable — skip caching
+        }
 
         return res.status(200).json({
             success: true,
@@ -58,17 +67,33 @@ export async function getCategoryAnalytics(req, res) {
         });
 
     } catch (err) {
-
+        console.error("getCategoryAnalytics error:", err);
         return res.status(500).json({
             success: false,
             message: "Internal server error"
         });
-
     }
 }
 
 export async function getTransactionSummary(req, res) {
     try {
+
+        const cacheKey = `summary:${req.user.companyId}`;
+
+        let cachedData = null;
+        try {
+            cachedData = await redisClient.get(cacheKey);
+        } catch {
+            // Redis unavailable — skip cache
+        }
+
+        if (cachedData) {
+            return res.status(200).json({
+                success: true,
+                ...JSON.parse(cachedData),
+                cached: true
+            });
+        }
 
         const company = await companyModel.findById(req.user.companyId);
 
@@ -92,37 +117,6 @@ export async function getTransactionSummary(req, res) {
             }
         ]);
 
-        const cacheKey = `summary:${req.user.companyId}`;
-
-        const cachedData = await redisClient.get(cacheKey);
-
-        if (cachedData) {
-            return res.status(200).json({
-                success: true,
-                ...JSON.parse(cachedData),
-                cached: true
-            });
-        }
-
-        const result = {
-            totalIncome,
-            totalExpense,
-            balance: totalIncome - totalExpense
-        };
-
-        await redisClient.set(
-            cacheKey,
-            JSON.stringify(result),
-            {
-                EX: 300
-            }
-        );
-
-        return res.status(200).json({
-            success: true,
-            ...result
-        });
-
         let totalIncome = 0;
         let totalExpense = 0;
 
@@ -136,19 +130,34 @@ export async function getTransactionSummary(req, res) {
             }
         });
 
-        return res.status(200).json({
-            success: true,
+        const result = {
             totalIncome,
             totalExpense,
             balance: totalIncome - totalExpense
+        };
+
+        try {
+            await redisClient.set(
+                cacheKey,
+                JSON.stringify(result),
+                {
+                    EX: 300
+                }
+            );
+        } catch {
+            // Redis unavailable — skip caching
+        }
+
+        return res.status(200).json({
+            success: true,
+            ...result
         });
 
     } catch (err) {
-
+        console.error("getTransactionSummary error:", err);
         return res.status(500).json({
             success: false,
             message: "Internal server error"
         });
-
     }
 }
