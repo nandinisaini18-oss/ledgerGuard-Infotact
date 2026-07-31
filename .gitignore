@@ -23,6 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 
+# dotenv environment variable files
+.env
+.env.*
+
+
 # OpenCode skills
 .opencode/skills/
 .agents/skills/
