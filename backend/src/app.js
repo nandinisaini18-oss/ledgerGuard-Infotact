@@ -3,7 +3,6 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 import authRouter from "./routes/auth.routes.js"
 import companyRouter from "./routes/company.routes.js"
-import companyListRouter from "./routes/company.list.routes.js"
 import transactionRouter from "./routes/transaction.routes.js"
 import analyticsRouter from "./routes/analytics.routes.js";
 import { errorHandler } from "./middlewares/error.midlleware.js"
@@ -29,7 +28,6 @@ app.use(express.json())
 
 app.use("/api/auth/user" , authRouter)
 app.use("/api/auth/company" , companyRouter)
-app.use("/api/companies" , companyListRouter)
 app.use("/api/transactions" , transactionRouter)
 app.use("/api/analytics", analyticsRouter);
 

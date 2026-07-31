@@ -43,7 +43,7 @@ export async function registerUser(req , res){
             fullname,
             email,
             password,
-            role: "user",
+            role,
             companyId
         })
 
