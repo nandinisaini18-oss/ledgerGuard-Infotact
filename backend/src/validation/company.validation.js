@@ -18,3 +18,19 @@ export const companyValidation = [
         .withMessage("Invalid subscription plan"),
 
 ];
+
+export const updateCompanyProfileValidation = [
+    body("companyName")
+        .optional()
+        .trim()
+        .notEmpty().withMessage("Company name is required")
+        .isLength({ min: 3 }).withMessage("Company name must be at least 3 characters"),
+
+    body("companyEmail")
+        .optional()
+        .trim()
+        .notEmpty().withMessage("Company email is required")
+        .isEmail().withMessage("Invalid email format")
+        .normalizeEmail(),
+
+];
