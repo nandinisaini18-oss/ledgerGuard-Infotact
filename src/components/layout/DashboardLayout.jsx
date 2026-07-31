@@ -42,6 +42,12 @@ export default function DashboardLayout() {
             >
               Analytics
             </Link>
+            <Link
+              to="/company"
+              className={`dashboard-header__nav-link ${location.pathname === '/company' ? 'dashboard-header__nav-link--active' : ''}`}
+            >
+              Company
+            </Link>
           </nav>
           <button className="dashboard-header__logout" onClick={handleLogout}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
