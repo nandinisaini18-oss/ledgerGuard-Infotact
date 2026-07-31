@@ -6,6 +6,7 @@ import companyRouter from "./routes/company.routes.js"
 import transactionRouter from "./routes/transaction.routes.js"
 import analyticsRouter from "./routes/analytics.routes.js";
 import companyProfileRouter from "./routes/companyProfile.routes.js";
+import userRouter from "./routes/user.routes.js";
 import { errorHandler } from "./middlewares/error.midlleware.js"
 import { config } from "./config/config.js"
 
@@ -32,6 +33,7 @@ app.use("/api/auth/company" , companyRouter)
 app.use("/api/transactions" , transactionRouter)
 app.use("/api/analytics", analyticsRouter);
 app.use("/api/company" , companyProfileRouter);
+app.use("/api/users", userRouter);
 
 app.get("/", (req, res) => {
     res.status(200).json({
