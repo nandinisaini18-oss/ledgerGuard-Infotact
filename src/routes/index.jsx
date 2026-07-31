@@ -15,6 +15,10 @@ import EditTransaction from '../pages/EditTransaction'
 import ViewTransaction from '../pages/ViewTransaction'
 import Analytics from '../pages/Analytics'
 import CompanyProfile from '../pages/CompanyProfile'
+import Users from '../pages/Users'
+import UserDetails from '../pages/UserDetails'
+import AddUser from '../pages/AddUser'
+import EditUser from '../pages/EditUser'
 import ProtectedRoute from '../components/ProtectedRoute'
 import AdminRoute from '../components/AdminRoute'
 import NotFound from '../pages/NotFound'
@@ -70,6 +74,10 @@ function AppRoutesInner() {
               <Route path="/transactions/:id/edit" element={<AdminRoute><EditTransaction /></AdminRoute>} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/company" element={<CompanyProfile />} />
+              <Route path="/users" element={<AdminRoute><Users /></AdminRoute>} />
+              <Route path="/users/new" element={<AdminRoute><AddUser /></AdminRoute>} />
+              <Route path="/users/:id" element={<AdminRoute><UserDetails /></AdminRoute>} />
+              <Route path="/users/:id/edit" element={<AdminRoute><EditUser /></AdminRoute>} />
             </Route>
           </>
         ) : (

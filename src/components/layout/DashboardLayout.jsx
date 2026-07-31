@@ -1,10 +1,12 @@
 import { useNavigate, Outlet, Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import useIsAdmin from '../../hooks/useIsAdmin'
 import { logoutUser } from '../../services/user'
 import Logo from '../ui/Logo'
 
 export default function DashboardLayout() {
   const { setUser } = useAuth()
+  const isAdmin = useIsAdmin()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -42,6 +44,14 @@ export default function DashboardLayout() {
             >
               Analytics
             </Link>
+            {isAdmin && (
+              <Link
+                to="/users"
+                className={`dashboard-header__nav-link ${location.pathname.startsWith('/users') ? 'dashboard-header__nav-link--active' : ''}`}
+              >
+                Users
+              </Link>
+            )}
             <Link
               to="/company"
               className={`dashboard-header__nav-link ${location.pathname === '/company' ? 'dashboard-header__nav-link--active' : ''}`}
