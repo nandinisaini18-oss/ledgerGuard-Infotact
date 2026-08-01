@@ -6,6 +6,7 @@ import Button from '../components/ui/Button'
 import EmptyState from '../components/ui/EmptyState'
 import Input from '../components/ui/Input'
 import { validateRequired, validateEmail } from '../utils/validators'
+import { getInitials } from '../utils/display'
 import useIsAdmin from '../hooks/useIsAdmin'
 
 function CompanyProfileSkeleton() {
@@ -175,6 +176,17 @@ export default function CompanyProfile() {
           </Button>
         )}
       </div>
+
+      {company && (
+        <div className="company-profile__cover">
+          <span
+            className={`company-profile__cover-mark ${company.status === 'active' ? 'company-profile__cover-mark--active' : ''}`}
+            aria-hidden="true"
+          >
+            {getInitials(company.companyName)}
+          </span>
+        </div>
+      )}
 
       {success && (
         <div className="company-profile__notice" role="status">

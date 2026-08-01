@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { getUserById } from '../services/user'
 import Button from '../components/ui/Button'
 import Alert from '../components/ui/Alert'
+import { getInitials } from '../utils/display'
 
 function UserDetailsSkeleton() {
   return (
@@ -105,7 +106,7 @@ export default function UserDetails() {
   }
 
   return (
-    <div className="view-transaction">
+    <div className="view-transaction user-details">
       <header className="vt-header">
         <div className="vt-header__left">
           <Link to="/users" className="vt-header__back" aria-label="Back to users">
@@ -121,6 +122,19 @@ export default function UserDetails() {
           <span className="vt-header__current">{user.fullname || '\u2014'}</span>
         </div>
       </header>
+
+      <div className="user-details__profile">
+        <span
+          className={`user-details__avatar ${user.role === 'admin' ? 'user-details__avatar--admin' : 'user-details__avatar--user'}`}
+          aria-hidden="true"
+        >
+          {getInitials(user.fullname)}
+        </span>
+        <div className="user-details__identity">
+          <p className="user-details__name">{user.fullname || '\u2014'}</p>
+          <p className="user-details__email">{user.email || '\u2014'}</p>
+        </div>
+      </div>
 
       <div className="vt-details">
         <h2 className="vt-details__heading">User Details</h2>

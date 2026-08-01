@@ -120,6 +120,10 @@ export default function Analytics() {
     return <AnalyticsSkeleton />
   }
 
+  const maxCategoryAmount = categories.length > 0
+    ? Math.max(...categories.map((cat) => cat.totalAmount), 1)
+    : 1
+
   return (
     <div className="analytics">
       <div className="analytics__header">
@@ -220,18 +224,29 @@ export default function Analytics() {
                   </tr>
                 </thead>
                 <tbody>
-                  {categories.map((cat) => (
-                    <tr key={cat._id} className="transaction-table__row">
-                      <td className="transaction-table__cell">
-                        <span className="analytics__category-badge">{cat._id}</span>
-                      </td>
-                      <td className="transaction-table__cell">
-                        <span className="analytics__category-amount">
-                          ₹{cat.totalAmount.toFixed(2)}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                  {categories.map((cat) => {
+                    const width = `${Math.max((cat.totalAmount / maxCategoryAmount) * 100, 2)}%`
+                    return (
+                      <tr key={cat._id} className="transaction-table__row">
+                        <td className="transaction-table__cell">
+                          <div className="analytics__category-cell">
+                            <span className="analytics__category-badge">{cat._id}</span>
+                            <div className="analytics__category-bar" aria-hidden="true">
+                              <span
+                                className="analytics__category-bar-fill"
+                                style={{ width }}
+                              />
+                            </div>
+                          </div>
+                        </td>
+                        <td className="transaction-table__cell">
+                          <span className="analytics__category-amount">
+                            ₹{cat.totalAmount.toFixed(2)}
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>

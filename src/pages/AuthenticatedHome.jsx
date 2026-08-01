@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context'
 import { logoutUser } from '../services/user'
+import { getInitials } from '../utils/display'
 import Logo from '../components/ui/Logo'
 import Button from '../components/ui/Button'
 
@@ -27,6 +28,18 @@ export default function AuthenticatedHome() {
         <div className="dashboard-header__inner">
           <Logo />
           <div className="dashboard-header__user">
+            <span className="user-chip" aria-label={`Logged in as ${user?.fullname || 'user'}`}>
+              <span
+                className={`user-chip__avatar ${user?.role === 'admin' ? 'user-chip__avatar--admin' : 'user-chip__avatar--user'}`}
+                aria-hidden="true"
+              >
+                {getInitials(user?.fullname)}
+              </span>
+              <span className="user-chip__info">
+                <span className="user-chip__name">{user?.fullname || 'User'}</span>
+                <span className="user-chip__role">{user?.role || ''}</span>
+              </span>
+            </span>
             <button className="dashboard-header__logout" onClick={handleLogout}>
               Logout
             </button>

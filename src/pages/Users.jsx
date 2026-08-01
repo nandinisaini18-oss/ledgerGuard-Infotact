@@ -7,6 +7,7 @@ import Button from '../components/ui/Button'
 import EmptyState from '../components/ui/EmptyState'
 import Modal from '../components/ui/Modal'
 import { PageTitleSkeleton } from '../components/ui/Skeleton'
+import { getInitials } from '../utils/display'
 
 const roleOptions = [
   { value: 'admin', label: 'Admin' },
@@ -67,7 +68,15 @@ function UserRow({ user, onOpenRole }) {
   return (
     <tr className="transaction-table__row">
       <td className="transaction-table__cell">
-        <span className="transaction-table__title">{user.fullname || '\u2014'}</span>
+        <span className="user-cell">
+          <span
+            className={`user-avatar ${user.role === 'admin' ? 'user-avatar--admin' : 'user-avatar--user'}`}
+            aria-hidden="true"
+          >
+            {getInitials(user.fullname)}
+          </span>
+          <span className="transaction-table__title">{user.fullname || '\u2014'}</span>
+        </span>
       </td>
       <td className="transaction-table__cell">{user.email || '\u2014'}</td>
       <td className="transaction-table__cell">
