@@ -211,7 +211,6 @@ export default function ViewTransaction() {
 
   return (
     <div className="view-transaction">
-      {/* Navigation Header */}
       <header className="vt-header">
         <div className="vt-header__left">
           <Link to="/transactions" className="vt-header__back" aria-label="Back to transactions">
@@ -250,16 +249,12 @@ export default function ViewTransaction() {
         </div>
       </header>
 
-      {/* Main Content Grid */}
       <div className="vt-grid">
-        {/* Left Column: Hero + Details */}
         <div className="vt-grid__main">
 
-          {/* Transaction Hero Card */}
           <div className={`vt-hero vt-hero--${typeClass}`}>
             <div className="vt-hero__accent" aria-hidden="true" />
             <div className="vt-hero__body">
-              {/* Top: Badges */}
               <div className="vt-hero__badges">
                 <span className={`vt-badge vt-badge--${typeClass}`}>
                   {typeIcons[transaction.type]}
@@ -270,14 +265,12 @@ export default function ViewTransaction() {
                 </span>
               </div>
 
-              {/* Amount */}
               <div className="vt-hero__amount-row">
                 <span className={`vt-hero__amount vt-hero__amount--${typeClass}`}>
                   {isIncome ? '+' : '−'}₹{(Number(transaction.amount) || 0).toFixed(2)}
                 </span>
               </div>
 
-              {/* Description */}
               {transaction.description && (
                 <div className="vt-hero__description">
                   <p className="vt-hero__description-text">{transaction.description}</p>
@@ -286,11 +279,9 @@ export default function ViewTransaction() {
             </div>
           </div>
 
-          {/* Details Panel */}
           <div className="vt-details">
             <h2 className="vt-details__heading">Details</h2>
             <div className="vt-details__grid">
-              {/* Transaction ID */}
               <div className="vt-meta-item">
                 <div className="vt-meta-item__icon" aria-hidden="true">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -305,7 +296,6 @@ export default function ViewTransaction() {
                 </div>
               </div>
 
-              {/* Created */}
               <div className="vt-meta-item">
                 <div className="vt-meta-item__icon" aria-hidden="true">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -324,7 +314,6 @@ export default function ViewTransaction() {
                 </div>
               </div>
 
-              {/* Last Updated */}
               <div className="vt-meta-item">
                 <div className="vt-meta-item__icon" aria-hidden="true">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -343,7 +332,6 @@ export default function ViewTransaction() {
                 </div>
               </div>
 
-              {/* Created By */}
               {transaction.createdBy && (
                 <div className="vt-meta-item">
                   <div className="vt-meta-item__icon" aria-hidden="true">
@@ -366,7 +354,6 @@ export default function ViewTransaction() {
                 </div>
               )}
 
-              {/* Company ID */}
               {transaction.companyId && (
                 <div className="vt-meta-item">
                   <div className="vt-meta-item__icon" aria-hidden="true">
@@ -391,7 +378,6 @@ export default function ViewTransaction() {
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
       <Modal
         isOpen={deleteDialogOpen}
         onClose={handleCancelDelete}

@@ -139,7 +139,6 @@ export default function Dashboard() {
 
   return (
     <div className="dash">
-      {/* Welcome Section */}
       <section className="dash__welcome">
         <div className="dash__welcome-content">
           <p className="dash__eyebrow">Welcome back</p>
@@ -154,7 +153,6 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* Quick Actions */}
       <section className="dash__section">
         <h2 className="dash__section-title">Quick Actions</h2>
         <div className="dash__actions-grid">
@@ -198,7 +196,6 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* Statistics */}
       <section className="dash__section">
         <h2 className="dash__section-title">Overview</h2>
         {loading ? (
@@ -254,7 +251,6 @@ export default function Dashboard() {
         )}
       </section>
 
-      {/* Recent Transactions */}
       <section className="dash__section">
         <div className="dash__section-header">
           <h2 className="dash__section-title">Recent Transactions</h2>
