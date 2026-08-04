@@ -28,11 +28,11 @@ const initialForm = {
 }
 
 export default function AddUser() {
-  const [form, setForm] = useState(initialForm)
-  const [errors, setErrors] = useState({})
-  const [submitError, setSubmitError] = useState('')
-  const [success, setSuccess] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [form, setForm] = useState(initialForm);
+  const [errors, setErrors] = useState({});
+  const [submitError, setSubmitError] = useState('');
+  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   function handleChange(e) {
     const { name, value } = e.target
