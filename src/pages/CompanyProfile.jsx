@@ -43,18 +43,18 @@ function formatDate(value) {
 }
 
 export default function CompanyProfile() {
-  const isAdmin = useIsAdmin()
-  const [company, setCompany] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [retryKey, setRetryKey] = useState(0)
+  const isAdmin = useIsAdmin();
+  const [company, setCompany] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [retryKey, setRetryKey] = useState(0);
 
-  const [isEditing, setIsEditing] = useState(false)
-  const [form, setForm] = useState({ companyName: '', companyEmail: '' })
-  const [fieldErrors, setFieldErrors] = useState({})
-  const [submitError, setSubmitError] = useState('')
-  const [submitLoading, setSubmitLoading] = useState(false)
-  const [success, setSuccess] = useState('')
+  const [isEditing, setIsEditing] = useState(false);
+  const [form, setForm] = useState({ companyName: '', companyEmail: '' });
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [submitError, setSubmitError] = useState('');
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [success, setSuccess] = useState('');
 
   const handleRetry = useCallback(() => {
     setLoading(true)
