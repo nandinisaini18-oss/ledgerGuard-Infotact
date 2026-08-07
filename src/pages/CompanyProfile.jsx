@@ -67,10 +67,10 @@ export default function CompanyProfile() {
       companyName: company?.companyName || '',
       companyEmail: company?.companyEmail || '',
     })
-    setFieldErrors({})
-    setSubmitError('')
-    setSuccess('')
-    setIsEditing(true)
+    setFieldErrors({});
+    setSubmitError('');
+    setSuccess('');
+    setIsEditing(true);
   }
 
   function handleCancelEdit() {
