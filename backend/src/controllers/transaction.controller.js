@@ -13,6 +13,8 @@ import { getTransactionModel } from "../models/tenantTransaction.model.js";
 export async function createTransaction(req, res) {
     const { title, amount, type, category, description } = req.body;
 
+    let session = null;
+
     try {
         const company = await companyModel.findById(req.user.companyId);
 
@@ -29,7 +31,7 @@ export async function createTransaction(req, res) {
 
         const Audit = getAuditModel(connection);
 
-        const session = await connection.startSession();
+        session = await connection.startSession();
 
         session.startTransaction();
 
@@ -69,6 +71,8 @@ export async function createTransaction(req, res) {
         await session.commitTransaction();
 
         session.endSession();
+
+        session = null;
 
         await redis.set(
             `idempotency:${req.idempotencyKey}`,
@@ -259,13 +263,24 @@ export async function updateTransaction(req, res) {
 
     const { id } = req.params;
 
+    let session = null;
+
     try {
 
         const company = await companyModel.findById(req.user.companyId);
 
+        if (!company) {
+            return res.status(404).json({
+                success: false,
+                message: "Company not found"
+            });
+        }
+
         const connection = getTenantConnection(company.databaseName);
 
         const Transaction = getTransactionModel(connection);
+
+        const Audit = getAuditModel(connection);
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
@@ -292,13 +307,53 @@ export async function updateTransaction(req, res) {
             });
         }
 
-        transaction.title = req.body.title ?? transaction.title;
-        transaction.amount = req.body.amount ?? transaction.amount;
-        transaction.type = req.body.type ?? transaction.type;
-        transaction.category = req.body.category ?? transaction.category;
-        transaction.description = req.body.description ?? transaction.description;
+        const updatableFields = ["title", "amount", "type", "category", "description"];
 
-        await transaction.save();
+        const changes = {};
+
+        for (const field of updatableFields) {
+            if (req.body[field] !== undefined && req.body[field] !== null) {
+                changes[field] = {
+                    before: transaction[field],
+                    after: req.body[field]
+                };
+            }
+        }
+
+        session = await connection.startSession();
+
+        session.startTransaction();
+
+        for (const field of Object.keys(changes)) {
+            transaction[field] = changes[field].after;
+        }
+
+        await transaction.save({ session });
+
+        await Audit.create(
+            [
+                {
+                    eventId: transaction.eventId,
+
+                    action: "UPDATE",
+
+                    transactionId: transaction._id,
+
+                    companyId: req.user.companyId,
+
+                    performedBy: req.user._id,
+
+                    changes
+                }
+            ],
+            { session }
+        );
+
+        await session.commitTransaction();
+
+        session.endSession();
+
+        session = null;
 
         await redis.del(`summary:${req.user.companyId}`);
         await redis.del(`category:${req.user.companyId}`);
@@ -310,6 +365,11 @@ export async function updateTransaction(req, res) {
         });
 
     } catch (err) {
+
+        if (session) {
+            await session.abortTransaction();
+            session.endSession();
+        }
 
         return res.status(500).json({
             success: false,
@@ -328,12 +388,23 @@ export async function deleteTransaction(req, res) {
 
     const { id } = req.params;
 
+    let session = null;
+
     try {
         const company = await companyModel.findById(req.user.companyId);
+
+        if (!company) {
+            return res.status(404).json({
+                success: false,
+                message: "Company not found"
+            });
+        }
 
         const connection = getTenantConnection(company.databaseName);
 
         const Transaction = getTransactionModel(connection);
+
+        const Audit = getAuditModel(connection);
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
@@ -359,10 +430,47 @@ export async function deleteTransaction(req, res) {
             });
         }
 
-        await transaction.deleteOne();
+        const snapshot = transaction.toObject();
+
+        session = await connection.startSession();
+
+        session.startTransaction();
+
+        await Audit.create(
+            [
+                {
+                    eventId: transaction.eventId,
+
+                    action: "DELETE",
+
+                    transactionId: transaction._id,
+
+                    companyId: req.user.companyId,
+
+                    performedBy: req.user._id,
+
+                    changes: snapshot
+                }
+            ],
+            { session }
+        );
+
+        await Transaction.deleteOne(
+            {
+                _id: transaction._id,
+                companyId: req.user.companyId
+            },
+            { session }
+        );
+
+        await session.commitTransaction();
+
+        session.endSession();
+
+        session = null;
 
         await redis.del(`summary:${req.user.companyId}`);
-        await redis.del(`category:${req.user.companyId}`);    
+        await redis.del(`category:${req.user.companyId}`);
 
         return res.status(200).json({
             success: true,
@@ -370,6 +478,11 @@ export async function deleteTransaction(req, res) {
         });
 
     } catch (err) {
+
+        if (session) {
+            await session.abortTransaction();
+            session.endSession();
+        }
 
         return res.status(500).json({
             success: false,
