@@ -1,10 +1,53 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { getTransactionSummary, getCategoryAnalytics } from '../services/analytics'
+import { getTransactionSummary, getCategoryAnalytics, getTrends } from '../services/analytics'
 import Alert from '../components/ui/Alert'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import EmptyState from '../components/ui/EmptyState'
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from 'recharts'
+
+const RANGE_OPTIONS = [
+  { value: '7d', label: '7d' },
+  { value: '30d', label: '30d' },
+  { value: '12m', label: '12m' },
+]
+
+const compactNumber = new Intl.NumberFormat('en-IN', {
+  notation: 'compact',
+  maximumFractionDigits: 1,
+})
+
+const formatCurrency = (value) => `₹${Number(value).toFixed(2)}`
+
+const formatCompactCurrency = (value) => `₹${compactNumber.format(Number(value))}`
+
+const tooltipFormatter = (value, name) => [formatCurrency(value), name]
+
+const CHART_TICK = { fill: '#64748b', fontSize: 12 }
+const CHART_GRID = '#e2e8f0'
+const CHART_AXIS_LINE = '#cbd5e1'
+const CHART_INCOME = '#059669'
+const CHART_EXPENSE = '#dc2626'
+const CHART_ACCENT = '#10b981'
+const CHART_TOOLTIP = {
+  borderRadius: 10,
+  border: '1px solid #e2e8f0',
+  boxShadow: '0 4px 8px rgba(15, 23, 42, 0.06)',
+  fontSize: 13,
+}
 
 function AnalyticsSkeleton() {
   return (
@@ -68,11 +111,20 @@ export default function Analytics() {
   const [summary, setSummary] = useState(null)
   const [categories, setCategories] = useState([])
   const [retryKey, setRetryKey] = useState(0)
+  const [range, setRange] = useState('30d')
+  const [trends, setTrends] = useState([])
+  const [trendsLoading, setTrendsLoading] = useState(true)
+  const [trendsError, setTrendsError] = useState('')
+  const [trendsRetryKey, setTrendsRetryKey] = useState(0)
 
   const handleRetry = useCallback(() => {
     setLoading(true)
     setError('')
     setRetryKey((k) => k + 1)
+  }, [])
+
+  const handleTrendsRetry = useCallback(() => {
+    setTrendsRetryKey((k) => k + 1)
   }, [])
 
   useEffect(() => {
@@ -115,6 +167,33 @@ export default function Analytics() {
     fetchAnalytics()
     return () => { cancelled = true }
   }, [retryKey])
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function fetchTrends() {
+      setTrendsLoading(true)
+      setTrendsError('')
+      try {
+        const res = await getTrends(range)
+        if (cancelled) return
+        if (res.data?.success) {
+          setTrends(res.data.data || [])
+        } else {
+          setTrendsError('Unable to load historical trends.')
+        }
+      } catch {
+        if (!cancelled) {
+          setTrendsError('Failed to load historical trends.')
+        }
+      } finally {
+        if (!cancelled) setTrendsLoading(false)
+      }
+    }
+
+    fetchTrends()
+    return () => { cancelled = true }
+  }, [range, trendsRetryKey])
 
   if (loading) {
     return <AnalyticsSkeleton />
@@ -251,6 +330,130 @@ export default function Analytics() {
               </table>
             </div>
           </Card>
+        )}
+      </section>
+
+      <section className="analytics__trends-section">
+        <div className="analytics__trends-header">
+          <h2 className="analytics__section-title">Historical Trends</h2>
+          <div className="analytics__range" role="group" aria-label="Time range">
+            {RANGE_OPTIONS.map((option) => {
+              const isActive = range === option.value
+              return (
+                <Button
+                  key={option.value}
+                  variant={isActive ? 'primary' : 'secondary'}
+                  size="sm"
+                  className="analytics__range-btn"
+                  aria-pressed={isActive}
+                  onClick={() => setRange(option.value)}
+                >
+                  {option.label}
+                </Button>
+              )
+            })}
+          </div>
+        </div>
+
+        {trendsLoading ? (
+          <>
+            <Card className="analytics__trends-card">
+              <div className="shimmer" style={{ width: '160px', height: '20px', marginBottom: '16px' }} />
+              <div className="shimmer analytics__chart-skeleton" />
+            </Card>
+            <Card className="analytics__trends-card">
+              <div className="shimmer" style={{ width: '140px', height: '20px', marginBottom: '16px' }} />
+              <div className="shimmer analytics__chart-skeleton" />
+            </Card>
+          </>
+        ) : trendsError ? (
+          <Card className="analytics__trends-card analytics__trends-error">
+            <Alert variant="error" message={trendsError} />
+            <Button variant="secondary" size="sm" onClick={handleTrendsRetry}>
+              Retry
+            </Button>
+          </Card>
+        ) : trends.length === 0 ? (
+          <Card className="analytics__empty">
+            <EmptyState
+              icon={
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                  <polyline points="17 6 23 6 23 12" />
+                </svg>
+              }
+              title="No trend data yet"
+              description="Transactions from the selected period will appear here."
+            />
+          </Card>
+        ) : (
+          <>
+            <Card className="analytics__trends-card">
+              <h3 className="analytics__chart-title">Revenue vs Expense</h3>
+              <div
+                className="analytics__chart"
+                role="img"
+                aria-label="Line chart comparing income and expense over the selected period"
+              >
+                <ResponsiveContainer width="100%" height={280}>
+                  <LineChart data={trends} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+                    <CartesianGrid stroke={CHART_GRID} strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="label" tick={CHART_TICK} tickLine={false} axisLine={{ stroke: CHART_AXIS_LINE }} />
+                    <YAxis tick={CHART_TICK} tickLine={false} axisLine={false} width={58} tickFormatter={formatCompactCurrency} />
+                    <Tooltip formatter={tooltipFormatter} contentStyle={CHART_TOOLTIP} />
+                    <Legend iconSize={10} wrapperStyle={{ fontSize: 13, paddingTop: 4 }} />
+                    <Line
+                      type="monotone"
+                      dataKey="income"
+                      name="Income"
+                      stroke={CHART_INCOME}
+                      strokeWidth={2}
+                      dot={{ r: 3, fill: CHART_INCOME, strokeWidth: 0 }}
+                      activeDot={{ r: 5 }}
+                      isAnimationActive={false}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="expense"
+                      name="Expense"
+                      stroke={CHART_EXPENSE}
+                      strokeWidth={2}
+                      dot={{ r: 3, fill: CHART_EXPENSE, strokeWidth: 0 }}
+                      activeDot={{ r: 5 }}
+                      isAnimationActive={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+
+            <Card className="analytics__trends-card">
+              <h3 className="analytics__chart-title">Balance Trend</h3>
+              <div
+                className="analytics__chart"
+                role="img"
+                aria-label="Bar chart showing balance over the selected period"
+              >
+                <ResponsiveContainer width="100%" height={280}>
+                  <BarChart data={trends} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+                    <CartesianGrid stroke={CHART_GRID} strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="label" tick={CHART_TICK} tickLine={false} axisLine={{ stroke: CHART_AXIS_LINE }} />
+                    <YAxis tick={CHART_TICK} tickLine={false} axisLine={false} width={58} tickFormatter={formatCompactCurrency} />
+                    <Tooltip formatter={tooltipFormatter} contentStyle={CHART_TOOLTIP} />
+                    <Legend iconSize={10} wrapperStyle={{ fontSize: 13, paddingTop: 4 }} />
+                    <Bar dataKey="balance" name="Balance" radius={[4, 4, 0, 0]} maxBarSize={42} isAnimationActive={false}>
+                      {trends.map((point) => (
+                        <Cell
+                          key={point.label}
+                          fill={Number(point.balance) >= 0 ? CHART_ACCENT : CHART_EXPENSE}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+          </>
         )}
       </section>
     </div>

@@ -2689,6 +2689,56 @@ select.form-field__input option:disabled { color: var(--color-gray-400); }
 
 .analytics__empty { padding: var(--space-10) var(--space-6); }
 
+.analytics__trends-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.analytics__trends-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.analytics__range {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.analytics__range .btn {
+  min-width: 52px;
+}
+
+.analytics__trends-card { overflow: hidden; }
+
+.analytics__chart-title {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-gray-900);
+  margin-bottom: var(--space-4);
+}
+
+.analytics__chart {
+  width: 100%;
+}
+
+.analytics__chart-skeleton {
+  height: 280px;
+  border-radius: var(--radius-lg);
+}
+
+.analytics__trends-error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-6);
+}
+
 /* ========================================================================
    COMPANY PROFILE
    ======================================================================== */
@@ -3092,6 +3142,7 @@ select.form-field__input option:disabled { color: var(--color-gray-400); }
   .analytics__header { flex-direction: column; }
   .analytics__summary-grid { grid-template-columns: repeat(2, 1fr); }
   .analytics__category-cell { min-width: 0; }
+  .analytics__trends-header { flex-direction: column; align-items: flex-start; }
 
   /* User details */
   .user-details__profile { padding: var(--space-5); }
@@ -3125,6 +3176,8 @@ select.form-field__input option:disabled { color: var(--color-gray-400); }
 
   .analytics__summary-grid { grid-template-columns: 1fr; }
   .analytics__summary-value { font-size: 1.25rem; }
+  .analytics__range { width: 100%; }
+  .analytics__range .btn { flex: 1; }
 
   .transaction-list__filters {
     flex-direction: column;

@@ -7,3 +7,7 @@ export function getTransactionSummary() {
 export function getCategoryAnalytics() {
   return api.get('/api/analytics/category')
 }
+
+export const getTrends = (range = "30d") => {
+  return api.get(`/api/analytics/trends?range=${range}`);
+};
