@@ -1,8 +1,11 @@
 import { Router } from "express";
 
 import { authenticateUser } from "../middlewares/auth.middleware.js";
-import { getTransactionSummary } from "../controllers/analytics.controller.js";
-import { getCategoryAnalytics } from "../controllers/analytics.controller.js";
+import {
+    getTransactionSummary,
+    getCategoryAnalytics,
+    getTrends,
+} from "../controllers/analytics.controller.js";
 
 const analyticsRouter = Router();
 
@@ -16,6 +19,12 @@ analyticsRouter.get(
     "/summary",
     authenticateUser,
     getTransactionSummary
+);
+
+analyticsRouter.get(
+    "/trends",
+    authenticateUser,
+    getTrends
 );
 
 export default analyticsRouter;

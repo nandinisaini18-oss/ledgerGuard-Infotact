@@ -161,3 +161,122 @@ export async function getTransactionSummary(req, res) {
         });
     }
 }
+
+export const getTrends = async (req, res) => {
+    try {
+        const range = req.query.range || "7d";
+
+        let startDate = new Date();
+        let groupFormat;
+
+        if (range === "7d" || range === "30d") {
+            const days = range === "7d" ? 7 : 30;
+            startDate.setDate(startDate.getDate() - days);
+            groupFormat = "%Y-%m-%d";
+        } else if (range === "12m") {
+            startDate.setMonth(startDate.getMonth() - 12);
+            groupFormat = "%Y-%m";
+        } else {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid range. Use 7d, 30d or 12m"
+            });
+        }
+
+        const company = await companyModel.findById(req.user.companyId);
+
+        if (!company) {
+            return res.status(404).json({
+                success: false,
+                message: "Company not found"
+            });
+        }
+
+        const connection = getTenantConnection(company.databaseName);
+
+        const Transaction = getTransactionModel(connection);
+
+        const trends = await Transaction.aggregate([
+            {
+                $match: {
+                    companyId: req.user.companyId,
+                    createdAt: {
+                        $gte: startDate
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        $dateToString: {
+                            format: groupFormat,
+                            date: "$createdAt"
+                        }
+                    },
+                    income: {
+                        $sum: {
+                            $cond: [
+                                { $eq: ["$type", "income"] },
+                                "$amount",
+                                0
+                            ]
+                        }
+                    },
+                    expense: {
+                        $sum: {
+                            $cond: [
+                                { $eq: ["$type", "expense"] },
+                                "$amount",
+                                0
+                            ]
+                        }
+                    }
+                }
+            },
+            {
+                $sort: {
+                    _id: 1
+                }
+            }
+        ]);
+
+        const data = trends.map(item => {
+            let label = item._id;
+
+            if (range === "12m") {
+                const [year, month] = item._id.split("-");
+                const date = new Date(Number(year), Number(month) - 1, 1);
+                label = date.toLocaleString("en-US", {
+                    month: "short",
+                    year: "numeric"
+                });
+            } else {
+                const [year, month, day] = item._id.split("-");
+                const date = new Date(Number(year), Number(month) - 1, Number(day));
+                label = date.toLocaleString("en-US", {
+                    month: "short",
+                    day: "2-digit"
+                });
+            }
+
+            return {
+                label,
+                income: item.income,
+                expense: item.expense,
+                balance: item.income - item.expense
+            };
+        });
+
+        return res.status(200).json({
+            success: true,
+            data
+        });
+
+    } catch (err) {
+        console.error("getTrends error:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+}
