@@ -26,5 +26,6 @@ export const config = {
     JWT_SECRET : process.env.JWT_SECRET,
     EXPIRES_IN : process.env.EXPIRES_IN,
     CLIENT_URL : process.env.CLIENT_URL,
-    REDIS_URL : process.env.REDIS_URL
+    REDIS_URL : process.env.REDIS_URL,
+    PUBLIC_KEY_PATH: process.env.PUBLIC_KEY_PATH
 }
